@@ -1,20 +1,20 @@
 import React from 'react';
-import Link from 'next/link';
 import Head from 'next/head';
 import AppLayout from '../components/AppLayout';
 
-const Home = () => {
+const NodeBird = ( { Component } ) => {
     return (
         <>
             <Head>
-                <title>NodeBird</title>
+                <title>NodeBird@@</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css" />
             </Head>
             <AppLayout>
-                <div>Hello, Next!</div>
+                <Component />
             </AppLayout>
         </>
     );
 };
 
-export default Home;
+// _app.js 로 이름을 지으면 자동으로 최상위 부모 레이아웃 컴포넌트가 된다.
+export default NodeBird;
