@@ -1,5 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
+import PropTypes from 'prop-types';
 import AppLayout from '../components/AppLayout';
 
 const NodeBird = ( { Component } ) => {
@@ -15,6 +16,10 @@ const NodeBird = ( { Component } ) => {
         </>
     );
 };
+
+NodeBird.propTypes = {
+    Component: PropTypes.node,
+}
 
 // _app.js 로 이름을 지으면 자동으로 최상위 부모 레이아웃 컴포넌트가 된다.
 export default NodeBird;
