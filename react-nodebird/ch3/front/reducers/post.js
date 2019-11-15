@@ -2,7 +2,7 @@ export const initialState = {
     mainPosts: [],
 };
 
-const APP_POST = 'ADD_POST';
+const ADD_POST = 'ADD_POST';
 const ADD_DUMMY = 'ADD_DUMMY';
 
 const addPost = {
@@ -32,8 +32,12 @@ const reducer = (state = initialState, action) => {
                 mainPosts: [action.data, ...state.mainPosts],
             }
         }
+        default: {
+            return {
+                ...state,
+            }
+        }
     }
-
 }
 
 export default reducer;
