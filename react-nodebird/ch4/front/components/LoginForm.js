@@ -1,18 +1,24 @@
 import React, { useCallback } from 'react';
 import { Button, Form, Input } from 'antd';
 import Link from 'next/link';
+import { useDispatch } from 'react-redux';
 import { useInput } from '../pages/user/signup';
+import { loginAction } from '../reducers/user';
 
 const LoginForm = () => {
-
     const [id, onChangeId] = useInput('');
     const [password, onChangePassword] = useInput('');
+    const dispatch = useDispatch();
+
     // useCallback 으로 감싸는 기준은 자식컴포넌트에 넘기는 함수는 무조건 감싸준다.
     const onSubmitForm = useCallback((e) => {
         e.preventDefault();
         console.log({
             id, password
         });
+
+        dispatch( loginAction );
+
     }, [id, password]);
 
     return (
