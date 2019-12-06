@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import {Form, Input, Checkbox, Button} from 'antd';
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { signUpAction } from '../../reducers/user';
 
 const TextInput = ( { value } ) => {
     return (
@@ -26,6 +28,7 @@ const Signup = () => {
     const [term, setTerm] = useState(false);
     const [passwordError, setPasswordError] = useState( false );
     const [termError, setTermError] = useState( false );
+    const dispatch = useDispatch();
 
     const onSubmit = useCallback((e) => {
         e.preventDefault();
@@ -36,6 +39,13 @@ const Signup = () => {
         if( !term ) {
             return setTermError(true);
         }
+
+        dispatch( signUpAction({
+            id,
+            password,
+            nick,
+        }) );
+
     }, [password, passwordCheck, term]); // 함수내부에서 쓰는 state를 배열로 넣으서 콜백함수의 파라미터로 호출해야 함.
 
     // useInput 커스텀훅을 만들고 id, password 등 반복되는 걸 사용
