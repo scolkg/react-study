@@ -28,6 +28,8 @@ NodeBird.propTypes = {
     store: PropTypes.object,
 }
 
+
+
 // _app.js 로 이름을 지으면 자동으로 최상위 부모 레이아웃 컴포넌트가 된다.
 export default withRedux((initialState, options) => {
     const sagaMiddleware = createSagaMiddleware();
