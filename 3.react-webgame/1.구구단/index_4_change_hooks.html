@@ -1,0 +1,65 @@
+<html>
+  <head>
+      <script crossorigin src="https://unpkg.com/react@16.7.0-alpha.0/umd/react.development.js"></script>
+      <script crossorigin src="https://unpkg.com/react-dom@16.7.0-alpha.0/umd/react-dom.development.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      // ==== 함수형 컴포넌트 ====
+      // setState()나 ref를 쓰지 않는 컴포넌트들은 간단하고 깔끔한 함수형 컴포넌트를 썼었다.
+      // 함수에도 setState랑 ref도 쓸 수 있게 해주세요~ 요청이 많아서 react가 함수형에도 그것들을 쓸 수 있게 해줬다.
+      // 그것이 바로 react hooks 이다.
+      const Gugudan = () => {
+        
+        const [first, setFirst] = React.useState( Math.ceil( Math.random() * 9 ));
+        const [second, setSecond] = React.useState( Math.ceil( Math.random() * 9 ));
+        const [value, setValue] = React.useState( '' );
+        const [result, setResult] = React.useState( '' );
+        const resultInput = React.useRef(null);
+
+        const onSubmitForm = (e) => {
+          e.preventDefault();
+          if( parseInt(value) === first * second){
+            // 역시 함수를 이용하면 이전 값도 컨트롤 가능
+            setResult( (prevResult) => {
+              console.log(prevResult);
+              return '이전 값: ' + prevResult;
+            } );
+
+            setResult('정답: ' + value);
+            setFirst( Math.ceil( Math.random() * 9 ) );
+            setSecond( Math.ceil( Math.random() * 9 ) );
+            setValue('');
+            resultInput.current.focus();
+          }else{
+            setResult('땡~:' + value);
+            setValue('');
+            resultInput.current.focus();
+          }
+          
+        }
+
+        const onChangeInput = (e) => {
+          setValue(e.target.value);
+        };
+
+        return (
+          <React.Fragment>
+            <div>{first} 곱하기 {second} 는?</div>
+            <form onSubmit={onSubmitForm}>
+              <input ref={resultInput} onChange={onChangeInput} value={value} />
+              <button id="" htmlFor="" className="">입력!</button>
+            </form>
+            <div id="result">{result}</div>
+          </React.Fragment>
+        );
+      }
+
+    </script>
+    <script type="text/babel">
+      ReactDOM.render( <Gugudan /> , document.querySelector('#root') );
+    </script>
+  </body>
+</html>
