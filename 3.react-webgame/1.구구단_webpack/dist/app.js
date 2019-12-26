@@ -81,19 +81,19 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = "./client.jsx");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./WordRelay.jsx":
-/*!***********************!*\
-  !*** ./WordRelay.jsx ***!
-  \***********************/
+/***/ "./Gugudan.jsx":
+/*!*********************!*\
+  !*** ./Gugudan.jsx ***!
+  \*********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("function _typeof(obj) { if (typeof Symbol === \"function\" && typeof Symbol.iterator === \"symbol\") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === \"function\" && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj; }; } return _typeof(obj); }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\nfunction _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === \"object\" || typeof call === \"function\")) { return call; } return _assertThisInitialized(self); }\n\nfunction _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }\n\nfunction _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function\"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }\n\nfunction _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\nvar React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar Component = React.Component;\n\nvar WordRelay =\n/*#__PURE__*/\nfunction (_Component) {\n  _inherits(WordRelay, _Component);\n\n  function WordRelay(props) {\n    var _this;\n\n    _classCallCheck(this, WordRelay);\n\n    _this = _possibleConstructorReturn(this, _getPrototypeOf(WordRelay).call(this, props));\n\n    _defineProperty(_assertThisInitialized(_this), \"onSubmitForm\", function (e) {\n      e.preventDefault();\n\n      if (_this.state.word[_this.state.word.length - 1] === _this.state.value[0]) {\n        _this.setState({\n          result: '딩동댕!',\n          word: _this.state.value,\n          value: ''\n        });\n\n        _this.input.focus();\n      } else {\n        _this.setState({\n          result: '땡~',\n          value: ''\n        });\n\n        _this.input.focus();\n      }\n    });\n\n    _defineProperty(_assertThisInitialized(_this), \"onChangeInput\", function (e) {\n      _this.setState({\n        value: e.target.value\n      });\n    });\n\n    _defineProperty(_assertThisInitialized(_this), \"input\", void 0);\n\n    _defineProperty(_assertThisInitialized(_this), \"onRefInput\", function (c) {\n      _this.input = c;\n    });\n\n    _this.state = {\n      word: '제로초',\n      value: '',\n      result: ''\n    };\n    return _this;\n  }\n\n  _createClass(WordRelay, [{\n    key: \"render\",\n    value: function render() {\n      return React.createElement(React.Fragment, null, React.createElement(\"div\", null, this.state.word), React.createElement(\"form\", {\n        onSubmit: this.onSubmitForm\n      }, React.createElement(\"input\", {\n        ref: this.onRefInput,\n        value: this.state.value,\n        onChange: this.onChangeInput\n      }), React.createElement(\"button\", null, \"\\uC785\\uB825\")), React.createElement(\"div\", null, this.state.result));\n    }\n  }]);\n\n  return WordRelay;\n}(Component);\n\nmodule.exports = WordRelay;\n\n//# sourceURL=webpack:///./WordRelay.jsx?");
+eval("function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }\n\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance\"); }\n\nfunction _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === \"[object Arguments]\")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i[\"return\"] != null) _i[\"return\"](); } finally { if (_d) throw _e; } } return _arr; }\n\nfunction _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }\n\nvar React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar useState = React.useState,\n    useRef = React.useRef;\n\nvar Gugudan = function Gugudan() {\n  var _useState = useState(Math.ceil(Math.random() * 9)),\n      _useState2 = _slicedToArray(_useState, 2),\n      first = _useState2[0],\n      setFirst = _useState2[1];\n\n  var _useState3 = useState(Math.ceil(Math.random() * 9)),\n      _useState4 = _slicedToArray(_useState3, 2),\n      second = _useState4[0],\n      setSecond = _useState4[1];\n\n  var _useState5 = useState(''),\n      _useState6 = _slicedToArray(_useState5, 2),\n      value = _useState6[0],\n      setValue = _useState6[1];\n\n  var _useState7 = useState(''),\n      _useState8 = _slicedToArray(_useState7, 2),\n      result = _useState8[0],\n      setResult = _useState8[1];\n\n  var resultInput = useRef(null);\n\n  var onSubmitForm = function onSubmitForm(e) {\n    e.preventDefault();\n\n    if (parseInt(value) === first * second) {\n      // 역시 함수를 이용하면 이전 값도 컨트롤 가능\n      setResult(function (prevResult) {\n        console.log(prevResult);\n        return '이전 값: ' + prevResult;\n      });\n      setResult('정답: ' + value);\n      setFirst(Math.ceil(Math.random() * 9));\n      setSecond(Math.ceil(Math.random() * 9));\n      setValue('');\n      resultInput.current.focus();\n    } else {\n      setResult('땡~:' + value);\n      setValue('');\n      resultInput.current.focus();\n    }\n  };\n\n  var onChangeInput = function onChangeInput(e) {\n    setValue(e.target.value);\n  };\n\n  return React.createElement(React.Fragment, null, React.createElement(\"div\", null, first, \" \\uACF1\\uD558\\uAE30 \", second, \" \\uB294?\"), React.createElement(\"form\", {\n    onSubmit: onSubmitForm\n  }, React.createElement(\"input\", {\n    ref: resultInput,\n    onChange: onChangeInput,\n    value: value\n  }), React.createElement(\"button\", {\n    id: \"\",\n    htmlFor: \"\",\n    className: \"\"\n  }, \"\\uC785\\uB825!\")), React.createElement(\"div\", {\n    id: \"result\"\n  }, result));\n};\n\nmodule.exports = Gugudan;\n\n//# sourceURL=webpack:///./Gugudan.jsx?");
 
 /***/ }),
 
@@ -104,7 +104,7 @@ eval("function _typeof(obj) { if (typeof Symbol === \"function\" && typeof Symbo
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar ReactDom = __webpack_require__(/*! react-dom */ \"./node_modules/react-dom/index.js\");\n\nvar WordRelay = __webpack_require__(/*! ./WordRelay */ \"./WordRelay.jsx\");\n\nReactDom.render(React.createElement(WordRelay, null), document.querySelector('#root'));\n\n//# sourceURL=webpack:///./client.jsx?");
+eval("var React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar ReactDOM = __webpack_require__(/*! react-dom */ \"./node_modules/react-dom/index.js\");\n\nvar Gugudan = __webpack_require__(/*! ./Gugudan */ \"./Gugudan.jsx\");\n\nReactDOM.render(React.createElement(Gugudan, null), document.querySelector('#root'));\n\n//# sourceURL=webpack:///./client.jsx?");
 
 /***/ }),
 
@@ -237,17 +237,6 @@ eval("\n\nif (false) {} else {\n  module.exports = __webpack_require__(/*! ./cjs
 
 "use strict";
 eval("\n\nif (false) {} else {\n  module.exports = __webpack_require__(/*! ./cjs/scheduler-tracing.development.js */ \"./node_modules/scheduler/cjs/scheduler-tracing.development.js\");\n}\n\n//# sourceURL=webpack:///./node_modules/scheduler/tracing.js?");
-
-/***/ }),
-
-/***/ 0:
-/*!**********************!*\
-  !*** multi ./client ***!
-  \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-eval("module.exports = __webpack_require__(/*! ./client */\"./client.jsx\");\n\n\n//# sourceURL=webpack:///multi_./client?");
 
 /***/ })
 

@@ -2,19 +2,16 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  name: 'word-relay-setting',
-  mode: 'development', // 실 서비스: production
-  devtool: 'eval',
+  name: 'gugudan-webpack-setting',
+  mode: 'development',
+  devtool: 'eval', // hidden-source-map
   resolve: {
-    extensions: [ '.js', '.jsx' ]
-  },
-  
-  // 입력을 받아서
-  entry: {
-    app: [ './client' ]
+    extensions: ['.jsx', '.js'],
   },
 
-  // 모듈을 적용해서
+  entry: {
+    app: './client',
+  },
   module: {
     rules: [{
       test: /\.jsx?$/,
@@ -28,25 +25,17 @@ module.exports = {
             debug: true,
           }], 
           '@babel/preset-react'],
-        plugins: [
-          "@babel/plugin-proposal-class-properties",
-          "react-hot-loader/babel"
-        ],
+        plugins: [],
       },
     }]
   },
 
-  // 추가할 확장기능들을 적용해서~
   plugins: [
     new webpack.LoaderOptionsPlugin({ debug: true }),
   ],
 
-  // 출력으로 뺀다~ webpack-dev-server를 쓰면 output은 지가 알아서 처리한다.
   output: {
-    path: path.join(__dirname, 'dist'),
     filename: 'app.js',
-    publicPath: '/dist/',
+    path: path.join(__dirname, 'dist'),
   },
-
-
 }
