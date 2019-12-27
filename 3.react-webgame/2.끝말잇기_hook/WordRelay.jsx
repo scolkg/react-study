@@ -6,7 +6,7 @@ class WordRelay extends Component {
     super(props);
 
     this.state = {
-      word: '건모',
+      word: '건모모',
       value: '',
       result: '',
     };
