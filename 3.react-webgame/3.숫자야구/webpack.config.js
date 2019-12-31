@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  name: 'word-relay-setting',
+  name: 'number-baseball-setting',
   mode: 'development', // 실 서비스: production
   devtool: 'eval',
   resolve: {
@@ -29,9 +29,11 @@ module.exports = {
           }], 
           '@babel/preset-react'],
         plugins: [
-          "react-hot-loader/babel"
+          "react-hot-loader/babel",
+          '@babel/plugin-proposal-class-properties'
         ],
       },
+      exclude: path.join(__dirname, 'node_modules'),
     }]
   },
 
@@ -43,7 +45,7 @@ module.exports = {
   // 출력으로 뺀다~ webpack-dev-server를 쓰면 output은 지가 알아서 처리한다.
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'app.js',
+    filename: '[name].js',
     publicPath: '/dist/',
   },
 

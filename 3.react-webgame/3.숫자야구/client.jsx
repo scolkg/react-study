@@ -3,6 +3,7 @@ import ReactDom from 'react-dom';
 import { hot } from 'react-hot-loader/root';
 
 import NumberBaseball from './NumberBaseball';
+//import NumberBaseball from './NumberBaseballHook';
 
 const Hot = hot(NumberBaseball);
 
