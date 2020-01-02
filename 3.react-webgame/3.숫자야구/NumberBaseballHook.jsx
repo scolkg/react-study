@@ -1,37 +1,85 @@
-import React , { Component } from 'react';
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import Try from './TryHook';
 
-const NumberBaseballHook = () => {
-  const [word, setWord] = useState('초밥');
-  const [value, setValue] = useState('');
+function getNumbers() { // 숫자 네 개를 겹치지 않고 랜덤하게 뽑는 함수
+  const candidate = [1,2,3,4,5,6,7,8,9];
+  const array = [];
+  for (let i = 0; i < 4; i += 1) {
+    const chosen = candidate.splice(Math.floor(Math.random() * (9 - i)), 1)[0];
+    array.push(chosen);
+  }
+  return array;
+}
+
+const NumberBaseball = () => {
   const [result, setResult] = useState('');
+  const [value, setValue] = useState('');
+  const [answer, setAnswer] = useState( getNumbers() );
+  const [tries, setTries] = useState( [] );
   const inputEl = useRef(null);
 
   const onSubmitForm = (e) => {
     e.preventDefault();
-    
+    if (value === answer.join('')) {
+      setResult('홈런!');
+      setTries( (prevTries) => (
+        [...prevTries, { try: value, result: '홈런!' }] 
+      ));
+      alert('게임을 다시 시작합니다!');
+      setValue('');
+      setAnswer( getNumbers() );
+      setTries( [] );
+      inputEl.current.focus();
+
+    } else { // 답 틀렸으면
+      const answerArray = value.split('').map((v) => parseInt(v));
+      let strike = 0;
+      let ball = 0;
+      if (tries.length >= 9) { // 10번 이상 틀렸을 때
+        setResult(`10번 넘게 틀려서 실패! 답은 ${answer.join(',')} 였습니다~!`);
+        alert('게임을 다시 시작합니다!');
+        setValue('');
+        setAnswer( getNumbers() );
+        setTries( [] );
+        inputEl.current.focus();
+      } else {
+        for (let i = 0; i < 4; i += 1) {
+          if (answerArray[i] === answer[i]) {
+            strike += 1;
+          } else if (answer.includes(answerArray[i])) {
+            ball += 1;
+          }
+        }
+        setTries( (prevTries) => (
+          [...prevTries, { try: value, result: `${strike} 스트라이크, ${ball} 볼입니다!` }]
+        ));
+        setValue('');
+        inputEl.current.focus();
+      }
+    }
   };
 
   const onChangeInput = (e) => {
-    setValue(e.currentTarget.value);
-  }
+    console.log(answer);
+    setValue( e.target.value );
+  };
 
   return (
     <>
-      <div>{word}</div>
+      <h1>{result}</h1>
       <form onSubmit={onSubmitForm}>
-        <label htmlFor="wordInput">글자를 입력하세요. </label>
-        <input id="wordInput" className="wordInput" ref={inputEl} value={value} onChange={onChangeInput} />
-        <button>입력</button>
+        <input ref={inputEl} maxLength={4} value={value} onChange={onChangeInput} />
       </form>
-      <div>{result}</div>
-    </>
+      <div>시도: {tries.length}</div>
+      <ul>
+        {tries.map((v, i) => {
+          return (
+            <Try key={`${i + 1}차 시도 :`} tryInfo={v} />
+          );
+        })}
+      </ul>
+      </>
   );
-};
+}
 
-
-export default NumberBaseballHook; // import NumberBaseball; <- 가져올때 // module.exports 와 같지만 엄밀히 말하면 좀 다르다... (어느정도 호환... 깊게 들어가면 좀 다르다)
-
-// export const NumberBaseball; // import { NumberBaseball } <- 가져올때
-
-// 즉 Component 는 { Component } 이런식으로 가져오니까 export const Component; 이런식인 것.
+export default NumberBaseball; // import NumberBaseball;
