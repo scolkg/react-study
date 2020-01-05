@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, memo } from 'react';
 import Try from './TryHook';
 
 function getNumbers() { // 숫자 네 개를 겹치지 않고 랜덤하게 뽑는 함수
@@ -11,7 +11,7 @@ function getNumbers() { // 숫자 네 개를 겹치지 않고 랜덤하게 뽑�
   return array;
 }
 
-const NumberBaseball = () => {
+const NumberBaseball = memo( () => {
   const [result, setResult] = useState('');
   const [value, setValue] = useState('');
   const [answer, setAnswer] = useState( getNumbers() );
@@ -72,6 +72,18 @@ const NumberBaseball = () => {
       </form>
       <div>시도: {tries.length}</div>
       <ul>
+        {/* 리액트 내부에서 for 문 쓰기 - 즉시실행함수이용!*/}
+        {/*
+        { (() => {
+            const array = [];
+            for( let i = 0 ; i < tries.length; i++ ){
+              array.push( <Try key={ `${i+1}차 시도: ${tries.try}` } tryInfo={tries} /> );
+            }
+            return array;
+          }
+        )()}
+        */}
+
         {tries.map((v, i) => {
           return (
             <Try key={`${i + 1}차 시도 :`} tryInfo={v} />
@@ -80,6 +92,6 @@ const NumberBaseball = () => {
       </ul>
       </>
   );
-}
+});
 
 export default NumberBaseball; // import NumberBaseball;

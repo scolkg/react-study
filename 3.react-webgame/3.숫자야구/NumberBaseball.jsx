@@ -77,7 +77,9 @@ class NumberBaseball extends Component {
     });
   };
 
-  inputRef = createRef(); // this.inputRef
+  // 이거와 같다. this.inputRef; onInputRef = (c) => { this.inputRef = c; }
+  inputRef = createRef(); 
+
 
   render() {
     const { result, value, tries } = this.state;
