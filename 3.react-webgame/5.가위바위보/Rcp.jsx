@@ -17,6 +17,12 @@ const scores = {
   보: -1,
 }
 
+const computerChoice = (imgCoord) => {
+  return Object.entries( rcpCoords ).find( function(v){
+    return v[1] === imgCoord;
+  })[0];
+}
+
 class Rcp extends Component {
   constructor(props){
     super(props);
@@ -47,7 +53,7 @@ class Rcp extends Component {
           imgCoord: rspCoords.바위,
         });
       }
-    }, 1000);
+    }, 1);
   }
 
   // 리랜더링
@@ -60,8 +66,35 @@ class Rcp extends Component {
     clearInterval(this.interval);
   }
 
-  onClickBtn = (e) => {
-    console.log(e);
+  onClickBtn = (choice) => {
+    // 버튼 누르면 일단 인터벌을 멈춰야 한다.
+    clearInterval(this.interval);
+    // 점수 계산. 내가 바위를 클릭했다면 0점, 컴퓨터가 가위라면 1점. 결과는 -1 (이긴거)
+    // 또는 내가 가위를 클릭했다면 1, 컴퓨터가 보를 클릭했다면 -1. 결과는 1 - (-1) = 2 (이긴거)
+    // 내가 가위를 클릭했다면 1, 컴퓨터가 바위라면 0점, 결과는 1 (진거)
+    // 0은 비긴거
+    const myScore = scores[choice];
+    const cpuSroce = scores[computerChoice(imgCoord)];
+    const diff = myScore - cpuSroce;
+    if( diff === 0 ){
+      this.setState({
+        result: '비겼습니다.',
+      });
+    }else if( [-1, 2].includes(diff) ){
+      this.setState( (prevState) => {
+        return {
+          result: '이겼당~^^',
+          score: prevState.score + 1,
+        }
+      });
+    }else {
+      this.setState( (prevState) => {
+        return {
+          result: '졌다 ㅜㅜ',
+          score: prevState.score - 1,
+        }
+      });
+    }
   }
 
   render() {
