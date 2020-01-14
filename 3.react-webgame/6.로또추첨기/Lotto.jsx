@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import Ball from './Ball';
+import TCP from './TestChildComponent';
 
 function getWinNumbers() {
   console.log('getWinNumbers()');
@@ -15,7 +16,7 @@ function getWinNumbers() {
   return [...winNumbers, bonusNumber];
 }
 
-class Lotto extends Component {
+class Lotto extends PureComponent {
   constructor(props){
     super(props);
     this.state = {
@@ -26,14 +27,14 @@ class Lotto extends Component {
     };
   }
 
-  shouldComponetUpdate( nextProps, nextState, nextContext ){
+/*   shouldComponentUpdate( nextProps, nextState, nextContext ){
     console.log('shouldComponentUpdate');
     return true;
-  }
+  } */
 
   timeouts = [];
 
-  componentDidMount() {
+  runTimeouts = () => {
     const { winNumbers } = this.state;
     // let을 쓰면 클로져 문제가 생기지 않는다. (es6오면서 편해진 점)
     for( let i = 0 ; i < this.state.winNumbers.length-1 ; i ++ ){
@@ -53,8 +54,16 @@ class Lotto extends Component {
     }, 3500);
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
+    this.runTimeouts();
+  }
 
+  componentDidUpdate(prevProps, prevState) {
+    // 이전 스테이트와 현재 스테이트를 비교하여 처리함. 그래야 필요할 때만 처리.
+    if( this.state.winBalls.length === 0 ) {
+      console.log("componentDidUpdate() : runTimeouts()" );
+      this.runTimeouts();
+    }
   }
 
   componentWillUnmount() {
@@ -63,9 +72,18 @@ class Lotto extends Component {
     });
   }
 
+  onClickRedo = () => {
+    this.setState({
+      winNumbers: getWinNumbers(), // 당첨 숫자들
+      winBalls: [],
+      bonus: null, // 보너스 공
+      redo: false,
+    });
+    this.timeouts = [];
+  }
 
   render() {
-    const { winBalls, bonus, redo } = this.state;
+    const { winBalls, bonus, redo, gun } = this.state;
     return (
       <>
         <div>로또 숫자</div>
@@ -75,6 +93,7 @@ class Lotto extends Component {
         <div>보너스!</div>
         { bonus && <Ball number={bonus} /> }
         { redo && <button onClick={ this.onClickRedo }>한 번 더!</button> }
+        <TCP gun={gun} redo={redo} />
       </>
     );
   }
