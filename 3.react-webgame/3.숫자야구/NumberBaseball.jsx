@@ -1,4 +1,4 @@
-import React, { Component, createRef } from 'react';
+import React, { Component, PureComponent, createRef } from 'react';
 import Try from './Try';
 
 function getNumbers() { // 숫자 네 개를 겹치지 않고 랜덤하게 뽑는 함수
@@ -11,7 +11,7 @@ function getNumbers() { // 숫자 네 개를 겹치지 않고 랜덤하게 뽑�
   return array;
 }
 
-class NumberBaseball extends Component {
+class NumberBaseball extends PureComponent {
   state = {
     result: '',
     value: '',

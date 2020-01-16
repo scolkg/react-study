@@ -1,7 +1,8 @@
-import React, { PureComponent } from 'react';
+import React, { Component, PureComponent } from 'react';
 
 class Ball extends PureComponent {
   render() {
+    console.log('Ball render()');
     const { number } = this.props;
     let background;
     if( number <= 10 ) {

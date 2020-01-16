@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 
-class Try extends Component {
+class Try extends  PureComponent {
   constructor(props){
     super(props);
     
@@ -10,10 +10,6 @@ class Try extends Component {
       try: this.props.try,
     };
 
-  }
-  
-  shouldComponentUpdate(nextProps, nextState, nextContext){
-    return false;
   }
 
   render() {

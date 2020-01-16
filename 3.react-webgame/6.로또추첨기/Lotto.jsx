@@ -55,6 +55,7 @@ class Lotto extends PureComponent {
   }
 
   componentDidMount() {
+    console.log('componentDidUpdate');
     this.runTimeouts();
   }
 
