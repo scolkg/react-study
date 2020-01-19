@@ -46,6 +46,20 @@ const LottoHooks = memo( () => {
   // 배열에 요소가 있으면 componentDidMount랑 componentDidUpdate 를 다 수행.
 
 
+  // componentDidUpdate에서만 ajax하고싶을 때, DidMount에선 실행하고 싶지 않을때 아래처럼 꼼수써야 함.
+  useEffect( () => {
+  
+  }, []);
+  const mounted = useRef(false);
+  useEffect( () => {
+    if( !mounted.current ) {
+      // ajax 
+    }
+    mounted.current = true;
+  }, [바뀌는값]);
+  // 즉, 배열인자가 비어있으면 바뀔 값이 없으니까 DidMount이고 실행코드에 아무것도 넣지 않으면 된다.
+  // 그리고 false인 값을 이용하여 최초 한번만 실행하게 하면 된다.
+
 
   /* 함수 생성 자체 시간이 넘 오래걸릴 때 이렇게 useCallback으로 함수를 기억해서 시간을 줄일 수 있다.
   그렇다면 모든 함수에 useCallback을 쓰면 좋을 순 있지만 아닐 경우도 있다.
