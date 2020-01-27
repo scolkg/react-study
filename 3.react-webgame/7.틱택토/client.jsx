@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import { hot } from 'react-hot-loader/root';
 
-//import TicTacToe from './TicTacToe';
-import TicTacToe from './TicTacToeHooks';
+import TicTacToe from './TicTacToe';
+//import TicTacToe from './TicTacToeClass';
 
 const Hot = hot( TicTacToe );
 
