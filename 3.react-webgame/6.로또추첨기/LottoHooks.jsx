@@ -18,8 +18,10 @@ function getWinNumbers() {
 
 const LottoHooks = memo( () => {
   const [winBalls, setWinBalls] = useState([]);
-  // 두번째 인자 배열이 바뀌면 다시 실행된다. 안넣으면 실행 안됨.
+  
+  // 두번째 인자 배열이 바뀌면 다시 실행된다. 안넣으면 실행 안됨. 즉 쓸데없는 함수호출을 피하기 위해 useMemo()쓴다.
   const lottoNumbers = useMemo( () => getWinNumbers(), []); 
+
   const [winNumbers, setWinNumbers] = useState(lottoNumbers);
   const [bonus, setBonus] = useState(null);
   const [redo, setRedo] = useState(false);
