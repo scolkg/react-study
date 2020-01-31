@@ -3,9 +3,9 @@ import React, { useState, useCallback, useContext }  from 'react';
 import { TableContext, START_GAME } from './MineSearch';
 
 const Form = () => {
-  const [row, setRow] = useState(3);
-  const [cell, setCell] = useState(3);
-  const [mine, setMine] = useState(3);
+  const [row, setRow] = useState(10);
+  const [cell, setCell] = useState(10);
+  const [mine, setMine] = useState(20);
 
   // 부모에서 export한 TableContext를 사용하겠다.
   const { dispatch } = useContext( TableContext );
