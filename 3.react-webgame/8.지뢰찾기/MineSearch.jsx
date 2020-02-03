@@ -75,16 +75,44 @@ const reducer = (state, action) => {
         halted : false,
       }
     case OPEN_CELL : {
-      const tableData = [...state.tableData];
+      const tableData = [...state.tableData]; // 불변성 지키지 위해서 배열은 이렇게 복사.
       tableData[action.row] = [...state.tableData[action.row]];
       tableData[action.row][action.cell] = CODE.OPENED;
+      
+      let around = [];
+
+      // 주변 셀 (8칸, 또는 3칸, 또는 5칸) 검사
+      if (tableData[action.row -1]) { // 내 윗줄이 있다면
+        around = around.concat(
+          tableData[action.row - 1][action.cell -1],
+          tableData[action.row - 1][action.cell],
+          tableData[action.row - 1][action.cell + 1],
+        );
+      }
+      around = around.concat( // 자신의 줄
+        tableData[action.row][action.cell -1],
+        tableData[action.row][action.cell +1],
+      );
+      if (tableData[action.row + 1]) { // 내 아랫줄이 있다면
+        around = around.concat(
+          tableData[action.row + 1][action.cell -1],
+          tableData[action.row + 1][action.cell],
+          tableData[action.row + 1][action.cell +1],  
+        );
+      }
+      // 주변 지뢰 있는지 찾아서 개수를 구한다.
+      const count = around.filter( (v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+
+      console.log(around, count);
+      tableData[action.row][action.cell] = count;
+
       return {
         ...state,
         tableData,
       }
     }
     case CLICK_MINE: {
-      const tableData = [...state.tableData]; // 불변성 지키지 위해서 배열은 이렇게 복사.
+      const tableData = [...state.tableData]; 
       tableData[action.row] = [...state.tableData[action.row]];
       tableData[action.row][action.cell] = CODE.CLICKED_MINE;
       return {
