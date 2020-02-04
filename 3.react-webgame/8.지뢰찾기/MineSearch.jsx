@@ -76,35 +76,69 @@ const reducer = (state, action) => {
       }
     case OPEN_CELL : {
       const tableData = [...state.tableData]; // 불변성 지키지 위해서 배열은 이렇게 복사.
-      tableData[action.row] = [...state.tableData[action.row]];
-      tableData[action.row][action.cell] = CODE.OPENED;
+      /* tableData[action.row] = [...state.tableData[action.row]];
+      tableData[action.row][action.cell] = CODE.OPENED; */
+      // 주변에 빈 칸들도 열어야 하는 작업때문에 다른 칸들도 불변성을 지켜야 한다.
+      // 즉 모든 칸들을 새로운 객체로 만들어줘야 한다.
+      tableData.forEach( (row, i) => {
+        tableData[i] = [...state.tableData[i]];
+      });
+
+      const checkAround = (row, cell) => {
+        let around = [];
+        // 주변 셀 (8칸, 또는 3칸, 또는 5칸) 검사
+        if (tableData[row -1]) { // 내 윗줄이 있다면
+          around = around.concat(
+            tableData[row - 1][cell -1],
+            tableData[row - 1][cell],
+            tableData[row - 1][cell + 1],
+          );
+        }
+        around = around.concat( // 자신의 줄
+          tableData[row][cell -1],
+          tableData[row][cell +1],
+        );
+        if (tableData[row + 1]) { // 내 아랫줄이 있다면
+          around = around.concat(
+            tableData[row + 1][cell -1],
+            tableData[row + 1][cell],
+            tableData[row + 1][cell +1],  
+          );
+        }
+        // 주변 지뢰 있는지 찾아서 개수를 구한다.
+        const count = around.filter( (v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+        console.log(around, count);
+        tableData[row][cell] = count;
+
+        // 주변에 mine이 없다면 재귀로 돌면서 빈칸을 모두 찾아 오픈한다.
+        if (count === 0) {
+          const near = [];
+          if (row - 1 > - 1) { // 윗칸
+            near.push( [row -1, cell -1] );
+            near.push( [row -1, cell] );
+            near.push( [row -1, cell +1] );
+          }
+          near.push( [row, cell -1] );
+          near.push( [row, cell +1] );
+          if (row + 1 < tableData.length) {
+            near.push( [row +1, cell -1] );
+            near.push( [row +1, cell] );
+            near.push( [row +1, cell +1] );
+          }
+          near.forEach( (n) => {
+            checkAround( n[0], n[1] );
+          });
+
+        } else {
+          
+        }
+
+      };
       
-      let around = [];
+      // 먼저 내 기준으로 주변 지뢰를 체크
+      checkAround(row, cell);
+      
 
-      // 주변 셀 (8칸, 또는 3칸, 또는 5칸) 검사
-      if (tableData[action.row -1]) { // 내 윗줄이 있다면
-        around = around.concat(
-          tableData[action.row - 1][action.cell -1],
-          tableData[action.row - 1][action.cell],
-          tableData[action.row - 1][action.cell + 1],
-        );
-      }
-      around = around.concat( // 자신의 줄
-        tableData[action.row][action.cell -1],
-        tableData[action.row][action.cell +1],
-      );
-      if (tableData[action.row + 1]) { // 내 아랫줄이 있다면
-        around = around.concat(
-          tableData[action.row + 1][action.cell -1],
-          tableData[action.row + 1][action.cell],
-          tableData[action.row + 1][action.cell +1],  
-        );
-      }
-      // 주변 지뢰 있는지 찾아서 개수를 구한다.
-      const count = around.filter( (v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
-
-      console.log(around, count);
-      tableData[action.row][action.cell] = count;
 
       return {
         ...state,
