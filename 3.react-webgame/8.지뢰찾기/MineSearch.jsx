@@ -84,8 +84,28 @@ const reducer = (state, action) => {
         tableData[i] = [...state.tableData[i]];
       });
 
+      const checked = []; // 재귀호출할 때 한번 검사한 칸은 다시 검사하지 않도록 하기 위함.
       const checkAround = (row, cell) => {
-        let around = [];
+        // 상하좌우 칸이 아닌 경우를 필터링
+        if ( row < 0 || row >= tableData.length || cell < 0 || cell >= tableData[0].length ) {
+          return;
+        }
+
+        // 닫힌 칸만 열기.
+        if ( [CODE.OPENED, CODE.FLAG_MINE, CODE.FLAG, CODE.QUESTION_MINE, CODE.QUESTION].includes( tableData[row][cell] )) {
+          return;
+        }
+
+        // 이미 검사한 칸이면 필터링.
+        if ( checked.includes( row +',' + cell )) {
+          return;
+        } else {
+          checked.push( row +','+ cell);
+        }
+
+        let around = [
+          tableData[row][cell - 1], tableData[row][cell + 1],
+        ];
         // 주변 셀 (8칸, 또는 3칸, 또는 5칸) 검사
         if (tableData[row -1]) { // 내 윗줄이 있다면
           around = around.concat(
@@ -94,10 +114,6 @@ const reducer = (state, action) => {
             tableData[row - 1][cell + 1],
           );
         }
-        around = around.concat( // 자신의 줄
-          tableData[row][cell -1],
-          tableData[row][cell +1],
-        );
         if (tableData[row + 1]) { // 내 아랫줄이 있다면
           around = around.concat(
             tableData[row + 1][cell -1],
@@ -106,39 +122,41 @@ const reducer = (state, action) => {
           );
         }
         // 주변 지뢰 있는지 찾아서 개수를 구한다.
-        const count = around.filter( (v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
-        console.log(around, count);
-        tableData[row][cell] = count;
+        const count = around.filter( function (v) {
+          return [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v);
+        }).length;
+        // const count = around.filter( (v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
 
         // 주변에 mine이 없다면 재귀로 돌면서 빈칸을 모두 찾아 오픈한다.
         if (count === 0) {
-          const near = [];
-          if (row - 1 > - 1) { // 윗칸
-            near.push( [row -1, cell -1] );
-            near.push( [row -1, cell] );
-            near.push( [row -1, cell +1] );
+          if (row > -1) {
+            const near = [];
+            if (row - 1 > - 1) { // 윗칸
+              near.push( [row -1, cell -1] );
+              near.push( [row -1, cell] );
+              near.push( [row -1, cell +1] );
+            }
+            near.push( [row, cell -1] );
+            near.push( [row, cell +1] );
+  
+            if (row + 1 < tableData.length) { // 아랫칸
+              near.push( [row +1, cell -1] );
+              near.push( [row +1, cell] );
+              near.push( [row +1, cell +1] );
+            }
+            near.forEach( (n) => {
+              // 닫혀 있는 near를 전부 연다
+              if ( tableData[ n[0] ][ n[1] ] !== CODE.OPENED ) {
+                checkAround(n[0], n[1]);
+              }
+            });
           }
-          near.push( [row, cell -1] );
-          near.push( [row, cell +1] );
-          if (row + 1 < tableData.length) {
-            near.push( [row +1, cell -1] );
-            near.push( [row +1, cell] );
-            near.push( [row +1, cell +1] );
-          }
-          near.forEach( (n) => {
-            checkAround( n[0], n[1] );
-          });
-
-        } else {
-          
         }
-
+        tableData[row][cell] = count;
       };
-      
-      // 먼저 내 기준으로 주변 지뢰를 체크
-      checkAround(row, cell);
-      
 
+      // 먼저 내 기준으로 주변 지뢰를 체크
+      checkAround(action.row, action.cell);
 
       return {
         ...state,
