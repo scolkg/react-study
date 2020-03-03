@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useContext }  from 'react';
+import React, { useState, useCallback, useContext, memo }  from 'react';
 
 import { TableContext, START_GAME } from './MineSearch';
 
-const Form = () => {
+const Form = memo(() => {
   const [row, setRow] = useState(10);
   const [cell, setCell] = useState(10);
   const [mine, setMine] = useState(20);
@@ -37,6 +37,6 @@ const Form = () => {
       <button onClick={onClickBtn} >시작</button>
     </div>
   );
-};
+});
 
 export default Form;
