@@ -1,7 +1,10 @@
 import React from 'react';
+import { Card, Avatar } from 'antd';
 
-const UserProfile = () => {
-    <Card
+const UserProfile = ( { userContent } ) => {
+  const dummy = userContent;
+    return (
+      <Card
         actions={[
             <div key="twit">짹쨱<br />{dummy.Post.length}</div>,
             <div key="following">팔로잉<br />{dummy.Followings.length}</div>,
@@ -12,7 +15,8 @@ const UserProfile = () => {
             avatar={<Avatar>{ dummy.nickname[0] }</Avatar>}
             title={dummy.nickname}
         />
-    </Card>
+      </Card>
+    );
 }
 
 export default UserProfile;

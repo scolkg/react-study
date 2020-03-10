@@ -10,7 +10,7 @@ const dummy = {
     Post: [],
     Followings: [],
     Followers: [],
-    isLoggedIn: false,
+    isLoggedIn: true,
 }
 
 const AppLayout = ( {children} ) => {
@@ -26,7 +26,7 @@ const AppLayout = ( {children} ) => {
             <Row gutter={8}>
                 <Col xs={24} md={6} >
                     { dummy.isLoggedIn 
-                        ? <UserProfile />
+                        ? <UserProfile userContent={dummy} />
                         : <LoginForm />
                     }
                 </Col>
