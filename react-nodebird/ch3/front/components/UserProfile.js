@@ -1,18 +1,33 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { Avatar, Card, Button } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutAction } from '../reducers/user';
 
 const UserProfile = () => {
-    <Card
-        actions={[
-            <div key="twit">짹쨱<br />{dummy.Post.length}</div>,
-            <div key="following">팔로잉<br />{dummy.Followings.length}</div>,
-            <div key="follower">팔로워<br />{dummy.Followers.length}</div>,
-        ]}
-    >
-        <Card.Meta
-            avatar={<Avatar>{ dummy.nickname[0] }</Avatar>}
-            title={dummy.nickname}
-        />
-    </Card>
+    const { user } = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
+    // useCallback()으로 감싸는 이유는 자식컴포넌트에게 props로 전달하기 떄문에~ 해줘야 한다.
+    const onLogout = useCallback(() => {
+        dispatch(logoutAction);
+    }, []);
+
+    return (
+        <Card
+            actions={[
+                <div key="twit">짹쨱<br />{user.Post.length}</div>,
+                <div key="following">팔로잉<br />{user.Followings.length}</div>,
+                <div key="follower">팔로워<br />{user.Followers.length}</div>,
+            ]}
+        >   
+            <Card.Meta
+                avatar={<Avatar>{ user.nickname[0] }</Avatar>}
+                title={user.nickname}
+            />
+            <Button onClick={onLogout}>로그아웃</Button>
+        </Card>
+    );
+    
 }
 
 export default UserProfile;

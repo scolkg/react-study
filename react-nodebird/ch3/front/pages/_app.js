@@ -6,7 +6,6 @@ import { createStore, compose, applyMiddleware } from 'redux';
 import withRedux from 'next-redux-wrapper';
 import { Provider } from 'react-redux';
 import reducer from '../reducers';
-import { initialState } from '../reducers/user';
 
 const NodeBird = ( { Component, store } ) => {
     return (

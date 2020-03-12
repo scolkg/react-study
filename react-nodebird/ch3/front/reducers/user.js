@@ -3,10 +3,18 @@
  * 안정성, state 통제 용이.
  * 단점: 코드가 많아짐.
 */
+
+const dummyUser = {
+    nickname: '스콜',
+    Post: [],
+    Followings: [],
+    Followers: [],
+};
+
 // store
 export const initialState = {
     isLoggedIn: false,
-    user: {},
+    user: null,
 };
 
 export const LOG_IN = 'LOG_IN'; // 액션의 이름
@@ -15,9 +23,6 @@ export const LOG_OUT = 'LOG_OUT';
 // action -> state를 바꾸는 행동
 export const loginAction = {
     type: LOG_IN,
-    data: {
-        nickname: '스콜',
-    },
 };
 export const logoutAction = {
     type: LOG_OUT,
@@ -30,7 +35,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 isLoggedIn: true,
-                user: action.data,
+                user: dummyUser,
             }
         }
         case LOG_OUT: {
