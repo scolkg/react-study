@@ -28,6 +28,7 @@ NodeBird.propTypes = {
 }
 
 // _app.js 로 이름을 지으면 자동으로 최상위 부모 레이아웃 컴포넌트가 된다.
+// withRedux로 NodeBird를 감싸줘서 store를 전달해줄 수 있게 하는 것.
 export default withRedux((initialState, options) => {
     const middlewares = [];
     const enhancer = compose(
@@ -35,6 +36,7 @@ export default withRedux((initialState, options) => {
         !options.isServer && typeof window.__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined' ? window.__REDUX_DEVTOOLS_EXTENSION__() : (f) => f,
     );
     const store = createStore(reducer, initialState, enhancer);
+    // 여기다가 store 커스터마이징할 수 있다.
 
     return store;
 })(NodeBird);

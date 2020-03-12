@@ -18,11 +18,12 @@ const dummy = {
   };
 
 const Home = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // react-redux hook 사용하기
   
   // 전체 state를 가져와서 구조분해로 isLoggedIn과 user를 가져온다.
-  const { isLoggedIn, user} = useSelector( state => state.user );
-
+  // react의 useState 가 useSelector 로 바뀌었다고 생각하면 된다.
+  // 또 setState가 dispatch로 바뀌었다고 생각하면 된다.
+  const { isLoggedIn, user } = useSelector( state => state.user );
 
   useEffect( () => {
     dispatch({
