@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 
-// hook을 지원하기전에는 하이오더 컴포넌츠로 구현했었음. 아래처럼
-// import { useDispatch, useSelector } from 'react-redux';
+////import { useDispatch, useSelector } from 'react-redux';
+// react redux hooks를 사용할 수 없을 때는 이렇게 connect로 하이오더 컴포넌트로 만들어서 썼다.
+// 보통 class 컴포넌트를 사용할 때는 connect를 이용한 하이오더 컴포넌트 방법으로 쓰고
+// 함수형 컴포넌트는 useDispatch, useSelector 등의 훅스를 이용하여 쓴다.
 import { connect } from 'react-redux';
 
 import { LOG_IN, LOG_OUT, loginAction, logoutAction } from '../reducers/user';
@@ -21,18 +23,15 @@ const dummy = {
     }],
   };
 
-const Home = ({ user, dispatch, login, logout }) => {
-  // const dispatch = useDispatch();
+const Home = ( { user, dispatch, login, logout } ) => {
+  //// const dispatch = useDispatch();
+  //// const { user } = useSelector(state => state.user);
   
-  // 전체 state를 가져와서 구조분해로 isLoggedIn과 user를 가져온다.
-  // const { isLoggedIn, user} = useSelector( state => state.user );
-
-
   useEffect( () => {
     login();
     logout();
     login();
-
+    logout();
   }, [] );
 
 
@@ -49,18 +48,18 @@ const Home = ({ user, dispatch, login, logout }) => {
     );
 };
 
-function mapStateToProps(state){
+// react state를 redux state로 1:1 매치를 시켜주는 함수
+function mapStateToProps( state ) {
   return {
     user: state.user,
   };
 }
 
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps( dispatch ) {
   return {
-    login: () => dispatch( loginAction ),
-    logout: () => dispatch( logoutAction ),
+    login: () => dispatch(loginAction),
+    logout: () => dispatch(logoutAction),
   }
 }
 
 export default connect( mapStateToProps, mapDispatchToProps )(Home);
-// export default Home; // hooks 사용시

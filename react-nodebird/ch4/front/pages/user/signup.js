@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { signUpAction } from '../../reducers/user';
 
+
 const TextInput = ( { value } ) => {
     return (
         <div>{value}</div>
@@ -28,6 +29,12 @@ const Signup = () => {
     const [term, setTerm] = useState(false);
     const [passwordError, setPasswordError] = useState( false );
     const [termError, setTermError] = useState( false );
+    
+    // useInput 커스텀훅을 만들고 id, password 등 반복되는 걸 사용
+    const [id, onChangeId] = useInput('');
+    const [nick, onChangeNick] = useInput('');
+    const [password, onChangePassword] = useInput('');
+    
     const dispatch = useDispatch();
 
     const onSubmit = useCallback((e) => {
@@ -47,11 +54,6 @@ const Signup = () => {
         }) );
 
     }, [password, passwordCheck, term]); // 함수내부에서 쓰는 state를 배열로 넣으서 콜백함수의 파라미터로 호출해야 함.
-
-    // useInput 커스텀훅을 만들고 id, password 등 반복되는 걸 사용
-    const [id, onChangeId] = useInput('');
-    const [nick, onChangeNick] = useInput('');
-    const [password, onChangePassword] = useInput('');
 
     const onChangePasswordCheck = useCallback((e) => {
         setPasswordError(e.target.value !== password);
