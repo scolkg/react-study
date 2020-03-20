@@ -14,7 +14,9 @@ const dummyUser = {
 
 // store
 export const initialState = {
+    isLoggingIn: false,
     isLoggedIn: false,
+    isLoading: false,
     user: null,
 };
 
@@ -22,7 +24,7 @@ export const LOG_IN = 'LOG_IN'; // 액션의 이름
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'; 
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE'; 
 export const LOG_OUT = 'LOG_OUT';
-export const SIGN_UP = 'SIGN_UP';
+export const SIGN_UP = 'SIGN_UP'; 
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
@@ -49,8 +51,17 @@ const reducer = (state = initialState, action) => {
         case LOG_IN: {
             return {
                 ...state,
+                isLoggingIn: true,
+                isLoading: true,
+            };
+        }
+        case LOG_IN_SUCCESS: {
+            return {
+                ...state,
+                isLoggingIn: false,
                 isLoggedIn: true,
                 user: dummyUser,
+                isLoading: false,
             };
         }
         case LOG_OUT: {

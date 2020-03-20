@@ -14,7 +14,7 @@ const Home = () => {
   const { mainPosts } = useSelector( state => state.post );
 
   useEffect( () => {
-    dispatch({
+/*     dispatch({
       type: LOG_IN,
       data: {
         nickname: '스콜'
@@ -37,7 +37,17 @@ const Home = () => {
 
     dispatch( logoutAction );
     dispatch( loginAction );
-    dispatch( logoutAction );
+    dispatch( logoutAction ); */
+
+    dispatch({
+      type: 'HELLO_SAGA',
+    });
+    dispatch({
+      type: 'HELLO_SAGA',
+    });
+    dispatch({
+      type: 'HELLO_SAGA',
+    });
 
   }, [] );
 
@@ -51,7 +61,7 @@ const Home = () => {
                   <PostCard key={c} post={c} />
               )                    
           })}
-      </div>
+        </div>
     );
 };
 
