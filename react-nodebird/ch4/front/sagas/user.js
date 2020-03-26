@@ -21,6 +21,7 @@ function loginAPI() {
 
 function* login() {
   try {
+    yield call(loginAPI);
     yield put({ // put은 dispatch와 동일.
       type: LOG_IN_SUCCESS,
     });
@@ -103,7 +104,14 @@ export default function* userSaga() {
     
   ]);
   
+
+  // call() 은 동기호출 ( 로그인 액션 -> 서버 응답 대기 -> 응답오면 그 후에 처리)
+  // fork() 는 비동기호출
+
+  // yield all() 안에 들어오면 굳이 fork를 안해도 작동은 잘 되는데
+  // 붙여주는 게 좋다. 왜냐면 all 안에 액션들은 순서가 없는데 (이벤트리스너 개념이니까)
 /*   yield all([
     fork( watchLogin ),
+    fork( watchHello ),
   ]); */
 }
