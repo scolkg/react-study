@@ -4,7 +4,6 @@ import { Form, Input, Checkbox, Button } from 'antd';
 import AppLayout from '../../components/AppLayout';
 
 const Signup = () => {
-
   // 커스텀 훅 만들기
   const useInput = (initValue = null) => {
     const [value, setter] = useState(initValue);
@@ -14,13 +13,6 @@ const Signup = () => {
     return [value, handler];
   };
 
-  // antd 컴포넌트 안에 들어가 있는 이벤트리스너들
-  // state가 바뀔때마다 통째로 함수컴포넌트가 재실행되어 그에 따라 함수들이
-  // 모두 새로 생성된다. 즉 함수를 props로 전달받는  자식컴포넌트들은
-  // 랜더링을 다시 한다는 것이다. 함수도 객체이기 때문에 이전 객체와 다른 객체가 되고
-  // 말기 떄문에 리랜더링되는 것이다.
-  // 그래서 props로 넘겨주는 함수는 useCallback() 사용은 필수이다.
-
   const [id, onChangeId] = useInput('');
   const [nick, onChangeNick] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -28,6 +20,13 @@ const Signup = () => {
   const [term, setTerm] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [termError, setTermError] = useState(false);
+
+  // antd 컴포넌트 안에 들어가 있는 이벤트리스너들
+  // state가 바뀔때마다 통째로 함수컴포넌트가 재실행되어 그에 따라 함수들이
+  // 모두 새로 생성된다. 즉 함수를 props로 전달받는  자식컴포넌트들은
+  // 랜더링을 다시 한다는 것이다. 함수도 객체이기 때문에 이전 객체와 다른 객체가 되고
+  // 말기 떄문에 리랜더링되는 것이다.
+  // 그래서 props로 넘겨주는 함수는 useCallback() 사용은 필수이다.
 
   const onSubmit = (e) => {
     e.preventDefault();
