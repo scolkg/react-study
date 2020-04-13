@@ -1,7 +1,7 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import Link from 'next/link';
-import { Menu, Input, Button } from 'antd';
+import { Menu, Input, Button, Row, Col } from 'antd';
 
 // eslint-disable-next-line react/prop-types
 const AppLayout = ({ children }) => {
@@ -15,6 +15,11 @@ const AppLayout = ({ children }) => {
         </Menu.Item>
       </Menu>
       <Link href="/user/signup"><a><Button>회원가입</Button></a></Link>
+      <Row>
+        <Col xs={24} md={6}>1</Col>
+        <Col xs={24} md={12}>2</Col>
+        <Col xs={24} md={6}>3</Col>
+      </Row>
       {children}
     </div>
   );

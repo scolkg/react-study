@@ -74,9 +74,6 @@ const Signup = () => {
     <>
       <Form onSubmit={onSubmit} style={{ padding: 10 }}>
         <div>
-          <TextInput value="aa" />
-        </div>
-        <div>
           <label htmlFor="user-id">아이디</label>
           <br />
           <TextInput value={id} onChange={onChangeId} />
