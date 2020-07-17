@@ -9,7 +9,9 @@ const Profile = () => {
         <title>프로필</title>
       </Head>
       <AppLayout>
-        <div>내 프로필~</div>
+        <NicknameEditForm />
+        <FollowingList header="팔로잉 목록" />
+        <FollowerList header="팔로워 목록" />
       </AppLayout>
     </>
   )

@@ -10,6 +10,10 @@ const ButtonWrapper = styled.div`
   margin-top: 10px;
 `;
 
+const FormWrapper = styled(Form)`
+  padding: 10px;
+`;
+
 // eslint-disable-next-line react/prop-types
 const LoginForm = ({ setIsLoggedIn }) => {
   const [id, setId] = useState('');
@@ -33,7 +37,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
 
   return (
     <>
-      <Form onFinish={onSubmitForm}>
+      <FormWrapper onFinish={onSubmitForm}>
         <div>
           <label htmlFor="user-id" style={styleLabel}>아이디</label>
           <br />
@@ -54,7 +58,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
           <Button type="primary" htmlType="submit" loading={false}>로그인</Button>
           <Link href="/signup"><a><Button>회원가입</Button></a></Link>
         </ButtonWrapper>
-      </Form>
+      </FormWrapper>
     </>
   );
 };
