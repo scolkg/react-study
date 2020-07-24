@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 // 인라인 스타일을 줘서 쓸데없는 리랜더링을 하지 않기 위해
@@ -14,7 +15,6 @@ const FormWrapper = styled(Form)`
   padding: 10px;
 `;
 
-// eslint-disable-next-line react/prop-types
 const LoginForm = ({ setIsLoggedIn }) => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
@@ -62,5 +62,9 @@ const LoginForm = ({ setIsLoggedIn }) => {
     </>
   );
 };
+
+LoginForm.propTypes = {
+  setIsLoggedIn: PropTypes.func.isRequired,
+}
 
 export default LoginForm;
