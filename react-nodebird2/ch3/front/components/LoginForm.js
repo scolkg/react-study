@@ -3,6 +3,10 @@ import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+
+import useInput from '../hooks/useInput';
+import { loginAction } from '../reducers/user';
 
 // 인라인 스타일을 줘서 쓸데없는 리랜더링을 하지 않기 위해
 // 이렇게 stalyed-components를 사용하여 스타일 컴포넌트를 만들어서 이용.
@@ -15,7 +19,8 @@ const FormWrapper = styled(Form)`
   padding: 10px;
 `;
 
-const LoginForm = ({ setIsLoggedIn }) => {
+const LoginForm = () => {
+  const dispatch = useDispatch();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   
@@ -32,7 +37,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
 
   const onSubmitForm = useCallback(() => {
     console.log(id, password);
-    setIsLoggedIn(true);
+    dispatch(loginAction({ id, password }));
   },[id, password]);
 
   return (
@@ -64,7 +69,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
 };
 
 LoginForm.propTypes = {
-  setIsLoggedIn: PropTypes.func.isRequired,
+  //setIsLoggedIn: PropTypes.func.isRequired,
 }
 
 export default LoginForm;

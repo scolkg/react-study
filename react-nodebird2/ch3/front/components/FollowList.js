@@ -4,11 +4,11 @@ import { List, Card, Button } from 'antd';
 import { StopOutlined } from '@ant-design/icons';
 
 const FollowList = ({ header, data }) => {
-    //const style = (() => ({}), []);
+    const style = useMemo(() => ({ marginBottom: '20px' }), []);
 
     return (
         <List
-            style={{ marginBottom: '20px' }}
+            style={style}
             grid={{ gutter: 4, xs: 2, md: 3 }}
             size="small"
             header={<div>{header}</div>}
