@@ -3,10 +3,10 @@ import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import useInput from '../hooks/useInput';
-import { loginAction } from '../reducers/user';
+import { loginRequestAction } from '../reducers/user';
 
 // 인라인 스타일을 줘서 쓸데없는 리랜더링을 하지 않기 위해
 // 이렇게 stalyed-components를 사용하여 스타일 컴포넌트를 만들어서 이용.
@@ -21,6 +21,7 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const { isLoggingIn } = useSelector((state) => state.user);
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   
@@ -37,7 +38,7 @@ const LoginForm = () => {
 
   const onSubmitForm = useCallback(() => {
     console.log(id, password);
-    dispatch(loginAction({ id, password }));
+    dispatch(loginRequestAction({ id, password }));
   },[id, password]);
 
   return (
@@ -60,7 +61,7 @@ const LoginForm = () => {
           />
         </div>
         <ButtonWrapper>
-          <Button type="primary" htmlType="submit" loading={false}>로그인</Button>
+          <Button type="primary" htmlType="submit" loading={isLoggingIn}>로그인</Button>
           <Link href="/signup"><a><Button>회원가입</Button></a></Link>
         </ButtonWrapper>
       </FormWrapper>
