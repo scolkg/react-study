@@ -1,4 +1,5 @@
 export const initialState = {
+
   followLoading: false, // 팔로우 시도중
   followDone: false,
   followError: null,
@@ -67,6 +68,7 @@ export const logoutRequestAction = () => ({
   type: LOG_OUT_REQUEST,
 });
 
+
 // 동적 액선 생성기. 이렇게 쓴다 -> store.dispatch(changeNickname('mighty tak'));
 export const changeNickname = (data) => {
   return {
@@ -75,8 +77,7 @@ export const changeNickname = (data) => {
   }
 };
 
-
-
+// saga의 watchLogin*() 과 거의 동시에 reducer의 이 LOG_IN_REQUEST로 함께 실행된다.
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case LOG_IN_REQUEST :

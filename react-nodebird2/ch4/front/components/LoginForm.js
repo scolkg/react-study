@@ -3,7 +3,7 @@ import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import useInput from '../hooks/useInput';
 import { loginRequestAction } from '../reducers/user';
@@ -21,6 +21,7 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const { isLoggingIn } = useSelector((state) => state.user);
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   
@@ -60,7 +61,7 @@ const LoginForm = () => {
           />
         </div>
         <ButtonWrapper>
-          <Button type="primary" htmlType="submit" loading={false}>로그인</Button>
+          <Button type="primary" htmlType="submit" loading={isLoggingIn}>로그인</Button>
           <Link href="/signup"><a><Button>회원가입</Button></a></Link>
         </ButtonWrapper>
       </FormWrapper>

@@ -19,6 +19,9 @@ function* logIn(action) {
   try {
     // call()은 동기로 호출해서 loginAPI에서 결과까지 기다렸다가 다음 라인을 실행해준다. 
     // 그래서 여기서 fork를 쓰면 안되겠지. fork()를 쓴다면 yield가 있어도 소용없다. 그냥 비동기로 진행 됨.
+    console.log('saga login request');
+    // call()은 동기로 호출해서 loginAPI에서 결과까지 기다렸다가 다음 라인을 실행해준다. 그래서 여기서 fork를 쓰면 안되겠지. fork()를 쓴다면 yield가 있어도 소용없다. 그냥 비동기로 진행 됨.
+
     // const result = yield call(logInAPI, action.data);
     
     // 챕터5전엔 서버가 없으므로 delay 이펙트와 더미데이터를 이용하여 테스트
