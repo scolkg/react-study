@@ -1,5 +1,4 @@
 export const initialState = {
-
   followLoading: false, // 팔로우 시도중
   followDone: false,
   followError: null,
