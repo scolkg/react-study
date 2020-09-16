@@ -18,7 +18,6 @@ function* addPost(action) {
     // const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -29,7 +28,7 @@ function* addPost(action) {
 }
 
 function addCommentAPI(data) {
-  return axios.post('/api/post/${data.postId}/Comment', data);
+  return axios.post(`/api/post/${data.postId}/Comment`, data);
 }
 
 function* addComment(action) {
