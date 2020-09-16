@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 
 import useInput from '../hooks/useInput';
-import { loginAction } from '../reducers/user';
+import { loginRequestAction } from '../reducers/user';
 
 // 인라인 스타일을 줘서 쓸데없는 리랜더링을 하지 않기 위해
 // 이렇게 stalyed-components를 사용하여 스타일 컴포넌트를 만들어서 이용.
@@ -37,7 +37,7 @@ const LoginForm = () => {
 
   const onSubmitForm = useCallback(() => {
     console.log(id, password);
-    dispatch(loginAction({ id, password }));
+    dispatch(loginRequestAction({ id, password }));
   },[id, password]);
 
   return (
