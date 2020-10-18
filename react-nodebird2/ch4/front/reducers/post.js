@@ -252,8 +252,8 @@ const reducer = (state = initialState, action) => {
       // 먼저 index를 찾고 (id)
       const postIndex = state.mainPosts.findIndex((v) => v.id === action.data.postId);
       // 찾은 index로 해당되는 post를 찾는다. 얕은 복사가 되니 불변성을 지켜야 하므로 새로운 객체로 만들어 준다
-      const post = { ...state.mainPosts[postIndex] }; 
-      post.Comments = [dummyComment(action.data.content), ...post.Comments]; // 이렇게 하면 얕은 복사가 되니 
+      const post = { ...state.mainPosts[postIndex] };
+      post.Comments = [dummyComment(action.data.content), ...post.Comments]; // 이렇게 하면 얕은 복사가 되니
       // 불변성을 지키기 위해 새로운 객체를 만들어줘야 한다.
       const mainPosts = [...state.mainPosts]; // 먼저 mainPosts부터 새로운 객체를 만들어주고
       mainPosts[postIndex] = post; // 해당되는 post도 새로운 객체를 만들어준다.
