@@ -7,17 +7,14 @@ import withReduxSaga from 'next-redux-saga';
 import wrapper from '../store/configureStore';
 
 // pages내부의 index.js의 리턴이 Component가 된다.(즉 _app.js가 부모가 된다.)
-const NodeBird = ({ Component }) => {
-  return (
-    <>
-      <Head>
-        <meta charSet="utf-8" />
-        <title>노드버드ch3</title>
-      </Head>
-      <Component />
-    </>
-  );
-};
+const NodeBird = ({ Component }) => (
+  <>
+    <Head>
+      <title>NodeBird</title>
+    </Head>
+    <Component />
+  </>
+);
 
 NodeBird.propTypes = {
   Component: PropTypes.elementType.isRequired,

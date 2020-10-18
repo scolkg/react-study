@@ -1,31 +1,40 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Input, Button } from 'antd';
 
 import { addPost } from '../reducers/post';
+import useInput from '../hooks/useInput';
 
 const PostForm = () => {
-  const { imagePaths } = useSelector((state) => state.post);
-
-  const imageInput = useRef();
-
   const dispatch = useDispatch();
 
-  const [text, setText] = useState('');
+  const { imagePaths, addPostDone } = useSelector((state) => state.post);
 
+  /* const [text, setText] = useState(''); // 이런 건 useInput() 커스텀훅을 사용하자.
   const onChangeText = useCallback((e) => {
     setText(e.target.value);
   }, []);
-  
-  const onSubmit = useCallback(() => {
-    dispatch(addPost);
-    setText('');
-  }, []);
+  */
 
+  // 이거 한 줄이면 끝.
+  const [text, onChangeText, setText] = useInput('');
+
+  // 짹짹이 성공했을 때 (addPostDone) 만 댓글창을 비워준다.
+  useEffect(() => {
+    if (addPostDone) {
+      setText('');
+    }
+  }, [addPostDone]);
+
+  const onSubmit = useCallback(() => {
+    dispatch(addPost(text));
+  }, [text]);
+
+  const imageInput = useRef();
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click();
   }, [imageInput.current]);
-  
+
   return (
     <Form style={{ margin: '10px 0 20px' }} encType="multipart/form-data" onFinish={onSubmit}> 
       <Input.TextArea

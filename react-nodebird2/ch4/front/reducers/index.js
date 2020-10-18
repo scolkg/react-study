@@ -9,11 +9,11 @@ const rootReducer = combineReducers({
   // 서버사이드랜더링을 위한 HYDRATE 사용을 위해 index추가.
   index: (state = {}, action) => {
     switch (action.type) {
-      case HYDRATE :
+      case HYDRATE:
         console.log('HYDRATE', action);
         return { ...state, ...action.payload };
-      
-      default :
+
+      default:
         return state;
     }
   },

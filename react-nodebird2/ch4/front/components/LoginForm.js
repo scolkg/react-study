@@ -22,14 +22,14 @@ const FormWrapper = styled(Form)`
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { logInLoading } = useSelector((state) => state.user);
-  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   // 리랜더링을 피하기 위한 useMemo를 사용하여 style을 준다.
   const styleLabel = useMemo(() => ({ color: 'blue' }), []);
 
-  const onChangeId = useCallback((e) => {
-    setId(e.target.value);
+  const onChangeEmail = useCallback((e) => {
+    setEmail(e.target.value);
   }, []);
 
   const onChangePassword = useCallback((e)=>{
@@ -37,17 +37,17 @@ const LoginForm = () => {
   }, []);
 
   const onSubmitForm = useCallback(() => {
-    console.log(id, password);
-    dispatch(loginRequestAction({ id, password }));
-  },[id, password]);
+    console.log(email, password);
+    dispatch(loginRequestAction({ email, password }));
+  },[email, password]);
 
   return (
     <>
       <FormWrapper onFinish={onSubmitForm}>
         <div>
-          <label htmlFor="user-id" style={styleLabel}>아이디</label>
+          <label htmlFor="user-email" style={styleLabel}>이메일</label>
           <br />
-          <Input name="user-id" value={id} onChange={onChangeId} required />
+          <Input name="user-email" type="email" value={email} onChange={onChangeEmail} required />
         </div>
         <div>
           <label htmlFor="user-password">비밀번호</label>

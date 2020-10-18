@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint", // 바벨이 해석 (최신문법으로 해도 바벨이 해석해서 파싱해준다)
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",
@@ -12,14 +13,22 @@
     "es6": true
   },
   "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended"
+    "airbnb" // airbnb 규칙이 강함.
   ],
   "plugins": [
     "import",
     "react-hooks"
   ],
-  "rules": {
-
+  "rules": { // 필요없는 것들은 꺼놓는다.
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "no-console": "off",
+    "no-underscore-dangle": "off",
+    "react/forbid-prop-types": "off",
+    "react/jsx-filename-extension": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "object-curly-newline": "off",
+    "linebreak-style": "off",
+    "no-param-reassign": "off"
   }
 }
