@@ -1,7 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { User } = require('../models'); // models 폴더 (models/index.js)를 구조분해할당
+const { User, Post } = require('../models'); // models 폴더 (models/index.js)를 구조분해할당
+const db = require('../models');
 
 const router = express.Router();
 
@@ -18,20 +19,49 @@ router.post('/login', (req, res, next) => {
       return res.status(401).send(info.reason); // 401: 허가되지 않음 이란 의미.
     }
 
-    // 성공하면 진짜 passport로 login하자.
+    // 성공하면 진짜 passport로 login하자. 이때 패스포트가 세션으로 로긴 데이터를 알아서 저장한다. (세션설정은 app.js 에서 함)
+    // 동시에 req.login() 마치고 다음에 passport.serializeUser() 가 자동 실행된다.
     return req.login(user, async (loginErr) => {
       if (loginErr) { // 그럴 일 거의 없지만 혹시나 passport에서 에러날 수 있으니...
         consoleerror(loginErr);
         return next(loginErr);
       }
 
+      // user를 프론트로 응답해주는데 필요한 정보를 가공해주자. 비번은 위험하니 빼자.(보낼필요도없고)
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        
+        // 원래는 attribute(데이터)를 갖고 오는데 attributes로 원하는 것만 가져올 수 있다.
+        attributes: {
+          exclude: ['password'],
+        },
+
+        // include를 통해서 user에 db의 여러 정보를 검색하여 포함시킨다.
+        include: [{
+          model: Post, // 여기선 단수지만 hasMany 관계라서 복수형이 되어 me.Posts가 된다.!!
+        }, {
+          model: User, // 마찬가지로 models/user의 Followings 모델 포함 (as가 있으면 as 써줘야한다!)
+          as: 'Followings',
+        }, {
+          model: User, // 마찬가지로 models/user의 Followers 모델 포함
+          as: 'Followers',
+        }]
+      });
+
       // 백엔드 로그인, passport 로그인 까지 성공하면 모두 끝!
-      return res.json(user); // 프론트로 응답 넘겨주자.
+      return res.status(200).json(fullUserWithoutPassword); // 프론트로 응답 넘겨주자. user ----> user.me (리듀서), action.data (사가) 가 된다.
     });
 
   })(req, res, next); // 미들웨어 확장 (res, next 등을 사용하게끔 하는 패턴)
 });
 
+// 유저 로그아웃
+router.post('/user/logout', (req, res) => {
+  // req.user에 담겨 있는 유저정보를 이용하면 되는데 로그아웃은 간단히 구형 가능
+  req.logout();
+  req.session.destory();
+  res.send('ok');
+});
 
 // 유저 회원가입
 router.post('/', async (req, res, next) => { // POST /user

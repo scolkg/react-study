@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
@@ -21,10 +21,10 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { logInLoading } = useSelector((state) => state.user);
+  const { logInLoading, logInError } = useSelector((state) => state.user);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // 리랜더링을 피하기 위한 useMemo를 사용하여 style을 준다.
   const styleLabel = useMemo(() => ({ color: 'blue' }), []);
 
@@ -39,7 +39,13 @@ const LoginForm = () => {
   const onSubmitForm = useCallback(() => {
     console.log(email, password);
     dispatch(loginRequestAction({ email, password }));
-  },[email, password]);
+  }, [email, password]);
+
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
 
   return (
     <>

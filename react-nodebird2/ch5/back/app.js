@@ -1,10 +1,17 @@
 const express = require('express');
 const cors = require('cors'); // 이 미들웨어만 사용하면 cors 해결.
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const dotenv = require('dotenv');
 
 const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
 const db = require('./models');
 const passportConfig = require('./passport');
+
+// 닷엔브 사용 설정 (.env파일의 내용이 치환되어 들어온다)
+dotenv.config();
 
 const app = express();
 
@@ -29,6 +36,21 @@ app.use(cors({
 // req.body를 쓰려면 라우터들 연결한 것보다 위에 먼저 설정해줘야 한다. 순서가 중요!
 app.use(express.json()); // json형태 데이터를 req.body로 넣어주는 기능을 사용하겠다는 것.
 app.use(express.urlencoded({ extended: true })); // form submit 했을 때 urlencoded형식으로 데이터가 들어오는데 이렇게 해야 req.body로 넣어준다는 것.
+
+// 쿠키 사용 설정
+app.use(cookieParser(process.env.COOKIE_SECRET));
+
+// 익스프레스 세션 설정
+app.use(session({
+  saveUinitialized: false,
+  resave: false,
+  secret: process.env.COOKIE_SECRET, // 이 시크릿을 토대로 만들어진 정보를 쿠키로 만들어내어 브라우저로 보내는 것.
+})); 
+
+// 패스포트 초기화
+app.use(passport.initialize());
+// 패스포트용 세션 설정
+app.use(passport.session());
 
 // 모든 라우트를 여기서 임포트한다.
 app.use('/post', postRouter);

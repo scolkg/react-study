@@ -14,7 +14,14 @@ const ErrorMessage = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError, me } = useSelector((state) => state.user);
+
+  // 로그인 여부
+  useEffect(() => {
+    if (me && me.id) {
+      Router.replace('/');
+    }
+  }, [me && me.id]);
 
   // 회원가입 완료 응답이 오면
   useEffect(() => {
@@ -111,7 +118,7 @@ const Signup = () => {
         </Form>
       </AppLayout>
     </>
-  )
+  );
 };
 
 export default Signup;
