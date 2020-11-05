@@ -19,25 +19,24 @@ import {
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
 function addPostAPI(data) {
-  return axios.post('/api/addPost', data);
+  return axios.post('/post', { content: data });
 }
 
 function* addPost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
-    const id = shortId.generate();
+    const result = yield call(addPostAPI, action.data);
+
     yield put({
       type: ADD_POST_SUCCESS,
       data: {
         id,
-        content: action.data,
+        content: result.data,
       },
     });
     // 동시에  user reducer의 액션도 호출하여 user reducer의 데이터도 변경 가능!
     yield put({
       type: ADD_POST_TO_ME,
-      data: id,
+      data: result.data.id,
     });
   } catch (err) {
     yield put({
@@ -94,15 +93,18 @@ function* removePost(action) {
 }
 
 function addCommentAPI(data) {
-  return axios.post(`/api/post/${data.postId}/Comment`, data);
+  // 어차피 data안에 게시글 아이디가 있으니 주소에 게시글 아이디 없어도 되지만
+  // 이렇게 하면 좀 더 이 주소가 어떤 의미인지 알아보기 쉽다.
+  return axios.post(`/post/${data.postId}/comment`, data); // POST /post/1/comment
 }
 
 function* addComment(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
+    const result = yield call(addPostAPI, action.data);
+
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({

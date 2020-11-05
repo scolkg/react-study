@@ -91,26 +91,6 @@ export const addComment = (data) => ({
   data,
 });
 
-const dummyPost = (data) => ({
-  id: data.id,
-  content: data.content,
-  User: {
-    id: 1,
-    nickname: '제로',
-  },
-  Images: [],
-  Comments: [],
-});
-
-const dummyComment = (data) => ({
-  id: shortId.generate(), // 랜덤한 id를 자동으로 만들어주는 shortId 라이브러리.
-  content: data,
-  User: {
-    id: 1,
-    nickname: '제로@@',
-  },
-});
-
 // reducer란 이전 상태를 액션을 통해 다음 상태로 만들어내는 함수! (단, 불변성을 지키면서!) ...이 필요없다!
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   // immer를 쓰면 불변성을 지키지 않아야 한다! 알아서 immer가 처리하기 때문에!
@@ -140,7 +120,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case ADD_POST_SUCCESS:
       draft.addPostLoading = false;
       draft.addPostDone = true;
-      draft.mainPosts.unshift(dummyPost(action.data));
+      draft.mainPosts.unshift(action.data);
       break;
     case ADD_POST_FAILURE:
       draft.addPostLoading = false;
@@ -177,8 +157,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       // 근데 위 방법은 매우 가독성이 어렵다. 그래서 이 불변성을 위한 라이브러리인 이머를 쓴다.
 
       // immer를 쓰면 간단하다 불변성 필수템! 두 줄로 끝!
-      const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-      post.Comments.unshift(dummyComment(action.data.content));
+      const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+      post.Comments.unshift(action.data);
       draft.addCommentLoading = false;
       draft.addCommentDone = true;
       break;

@@ -6,6 +6,7 @@ import postSaga from './post';
 
 // 기본 url 지정해줄 수 있다.
 axios.defaults.baseURL = 'http://localhost:3065';
+axios.defaults.withCredentials = true;
 
 // 만들고 싶은 비동기 액션들을 정의해준다.
 // fork: 제네레이터 함수를 '비동기' 실행해준다.

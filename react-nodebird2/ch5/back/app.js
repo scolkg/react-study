@@ -27,10 +27,11 @@ passportConfig();
 
 // cors 설정
 // origin: true 로 설정해두면 * 대신 보낸 곳의 주소가 자동으로 들어가 편리하다.
-// credentials 는 기본값이 false인데 나중에 true로 바꿔줘야 한다. 바꿔주지 않으면 문제가 생기는데...
+// credentials 는 기본값이 false인데 나중에 true로 바꿔줘야 한다. true로 해야 쿠키도 전달해준다. (로그인 유지 등)
+// *를 쓰면 쿠키를 보낼 때 안된다. 정확한 신뢰된 사이트 주소를 직접 적어줘야 한다. 아니면 true
 app.use(cors({
-  origin: true,
-  credentials: false,
+  origin: 'http://localhost:3000', // true
+  credentials: true,
 }));
 
 // req.body를 쓰려면 라우터들 연결한 것보다 위에 먼저 설정해줘야 한다. 순서가 중요!
@@ -46,7 +47,6 @@ app.use(session({
   resave: false,
   secret: process.env.COOKIE_SECRET, // 이 시크릿을 토대로 만들어진 정보를 쿠키로 만들어내어 브라우저로 보내는 것.
 })); 
-
 // 패스포트 초기화
 app.use(passport.initialize());
 // 패스포트용 세션 설정
@@ -55,6 +55,12 @@ app.use(passport.session());
 // 모든 라우트를 여기서 임포트한다.
 app.use('/post', postRouter);
 app.use('/user', userRouter);
+
+// 에러처리 미들웨어는 내부적으로 기본으로 존재하나 이렇게 커스텀할 수 있다.
+// 에러페이지를 따로 띄워주고 싶다던가 등등.
+/* app.use((err, req, res, next) => {
+  console.error('에러 처리 미들웨어');
+}); */
 
 app.listen(3065, () => {
   console.log('서버 실행 중');

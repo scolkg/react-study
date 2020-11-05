@@ -1,6 +1,6 @@
 const passport = require('passport');
-const { User } = require('../models');
 const local = require('./local');
+const { User } = require('../models');
 
 module.exports = () => {
 /*   브라우저(3060) ----------------------> 프론트(next)(3060) -----------------------> 백엔드(express)(3065)
@@ -28,7 +28,7 @@ module.exports = () => {
   // 로그인 이후 다음 요청부터는 아이디 정보로만 디비를 통하여 유저 데이터를 검색하여 복구해준다! 그걸 req.user에 넣어준다.
   passport.deserializeUser(async (id, done) => {
     try {
-      await User.findOne({ where: { id } }); // req.user 에 넣어준다. 그래서 다른 요청을 처리할 때 req.user를 사용하면 된다.
+      const user = await User.findOne({ where: { id } }); // req.user 에 넣어준다. 그래서 다른 요청을 처리할 때 req.user를 사용하면 된다.
       done(null, user);
     } catch(error) {
       console.error(error);
@@ -38,3 +38,11 @@ module.exports = () => {
 
   local();
 };
+
+// 프론트에서 서버로는 cookie만 보내요(clhxy)
+// 서버가 쿠키파서, 익스프레스 세션으로 쿠키 검사 후 id: 1 발견
+// id: 1이 deserializeUser에 들어감
+// req.user로 사용자 정보가 들어감
+
+// 요청 보낼때마다 deserializeUser가 실행됨(db 요청 1번씩 실행)
+// 실무에서는 deserializeUser 결과물 캐싱

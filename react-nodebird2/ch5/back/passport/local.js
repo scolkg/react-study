@@ -1,8 +1,8 @@
 const passport = require('passport');
 // 로컬 로그인 전략 (구조분해할당을 새로운 이름(LocalStrategy)로 짓는다.)
 const { Strategy: LocalStrategy} = require('passport-local');
-const { User } = require('../models');
 const bcrypt = require('bcrypt');
+const { User } = require('../models');
 
 module.exports = () => {
   try {

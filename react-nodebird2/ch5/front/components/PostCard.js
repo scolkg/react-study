@@ -35,7 +35,7 @@ const PostCard = ({ post }) => {
       type: REMOVE_POST_REQUEST,
       data: post.id,
     });
-  }, []);
+  }, [id]);
 
   return (
     <div style={{ marginBottom: 20 }}>

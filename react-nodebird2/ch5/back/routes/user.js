@@ -2,16 +2,24 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { User, Post } = require('../models'); // models 폴더 (models/index.js)를 구조분해할당
-const db = require('../models');
+
+// 커스텀으로 만든 미들웨어를 불러와서 라우터의 두번째 인자에 넣어서 next() 를 호출하면
+// 다음 미들웨어로 이동하라는 것이니 위에서부터 아래로, 왼쪽에서부터 아래로.
+// 로긴(/login)했을 때 먼저 isNotLoggedIn이 실행되고 next()가 호출되면
+// 다음 미들웨어인 passport.authenticate... 부분이 실행된다.
+// 에러가 생겨 next('에러')가 호출되면 에러처리 미들웨어로 간다. (app.js 끝 부분 참고)
+// 왜 직접 req.isAuthenticated() 를 써가면서 검사하면 되는데 왜 미들웨어로 따로 만들어서 쓸까?
+// 중복 제거!
+const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
 // 유저 로그인 - get인지 post인지 애매할 때는 포스트 쓴다. done()이 실행이 끝나고 두번째 인자로 전달되어 (서버에러, 성공객체, 인포객체) 로 콜백된다.
-router.post('/login', (req, res, next) => {
+router.post('/login', isNotLoggedIn, (req, res, next) => {
   passport.authenticate('local', (err, user, info) => { // POST /login
     if (err) {
       console.error(err);
-      next(err); // 에러나면 next()로 익스프레스가 에러처리하게끔 보낸다는 의미다.
+      return next(err); // 에러나면 next()로 익스프레스가 에러처리하게끔 보낸다는 의미다.
     }
 
     // 세번째 인포 객체가 있다는 것은 클라 에러가 있다는 것이므로
@@ -56,15 +64,26 @@ router.post('/login', (req, res, next) => {
 });
 
 // 유저 로그아웃
-router.post('/user/logout', (req, res) => {
+router.post('/logout', isLoggedIn, (req, res) => {
   // req.user에 담겨 있는 유저정보를 이용하면 되는데 로그아웃은 간단히 구형 가능
+  console.log("--> " + req.isAuthenticated());
+  console.log(req.session);
   req.logout();
-  req.session.destory();
+  console.log("@@->"+ req.isAuthenticated());
+  console.log(req.session);
+  // req.session.destory(); // 왜 안되지? - credentials 설정이 문젠가? ㅜ
+  // 일단 이렇게 콜백으로 에러 예외 처리... 쿠키를 클라한테 제대로 못받나?
+  req.session.destroy((err) =>{
+    // res.clearCookie('connect.sid');
+    console.log('error req.session.destroy()');
+    console.error(err);
+  });
+  
   res.send('ok');
 });
 
 // 유저 회원가입
-router.post('/', async (req, res, next) => { // POST /user
+router.post('/', isNotLoggedIn, async (req, res, next) => { // POST /user
   try {
     // 먼저 중복검사.
     // 팁: 비동기 작업인지 아닌지는 직접 공식문서찾아봐서 await를 넣어줄지 아닐지 알아봐야 한다.
