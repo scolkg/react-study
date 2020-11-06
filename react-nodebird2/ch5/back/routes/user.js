@@ -14,6 +14,45 @@ const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
+// 클라에서 온 유저 로그인 정보 쿠키를 이용하여 로그인 체크
+router.get('/', async (req, res, next) => { // GET /user
+  try {
+    // 새로고침할 때마다 호출되는데 req.user 즉 사용자 정보가 들어있을 때만 찾는다.
+    if (req.user) {
+      // user를 프론트로 응답해주는데 필요한 정보를 가공해주자. 비번은 위험하니 빼자.(보낼필요도없고)
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        
+        // 원래는 attribute(데이터)를 갖고 오는데 attributes로 원하는 것만 가져올 수 있다.
+        attributes: {
+          exclude: ['password'],
+        },
+
+        // include를 통해서 user에 db의 여러 정보를 검색하여 포함시킨다.
+        include: [{
+          model: Post, // 여기선 단수지만 hasMany 관계라서 복수형이 되어 me.Posts가 된다.!!
+          attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
+        }, {
+          model: User, // 마찬가지로 models/user의 Followings 모델 포함 (as가 있으면 as 써줘야한다!)
+          as: 'Followings',
+          attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
+        }, {
+          model: User, // 마찬가지로 models/user의 Followers 모델 포함
+          as: 'Followers',
+          attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
+        }]
+      });
+      
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 // 유저 로그인 - get인지 post인지 애매할 때는 포스트 쓴다. done()이 실행이 끝나고 두번째 인자로 전달되어 (서버에러, 성공객체, 인포객체) 로 콜백된다.
 router.post('/login', isNotLoggedIn, (req, res, next) => {
   passport.authenticate('local', (err, user, info) => { // POST /login
@@ -47,12 +86,15 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         // include를 통해서 user에 db의 여러 정보를 검색하여 포함시킨다.
         include: [{
           model: Post, // 여기선 단수지만 hasMany 관계라서 복수형이 되어 me.Posts가 된다.!!
+          attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
         }, {
           model: User, // 마찬가지로 models/user의 Followings 모델 포함 (as가 있으면 as 써줘야한다!)
           as: 'Followings',
+          attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
         }, {
           model: User, // 마찬가지로 models/user의 Followers 모델 포함
           as: 'Followers',
+          attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
         }]
       });
 

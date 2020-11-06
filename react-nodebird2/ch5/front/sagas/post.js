@@ -24,14 +24,14 @@ function addPostAPI(data) {
 
 function* addPost(action) {
   try {
+    console.log('saga addPost request');
+    console.log(action.data);
     const result = yield call(addPostAPI, action.data);
-
+    console.log(result);
+    console.log('====');
     yield put({
       type: ADD_POST_SUCCESS,
-      data: {
-        id,
-        content: result.data,
-      },
+      data: result.data,
     });
     // 동시에  user reducer의 액션도 호출하여 user reducer의 데이터도 변경 가능!
     yield put({
@@ -39,9 +39,10 @@ function* addPost(action) {
       data: result.data.id,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: ADD_POST_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -62,7 +63,7 @@ function* loadPosts(action) {
   } catch (err) {
     yield put({
       type: LOAD_POSTS_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }

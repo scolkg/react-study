@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
+import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
 
 // 반복문 map의 두번째 index 파라미터를 key값으로 쓸 때 주의해야 한다.
@@ -17,6 +18,11 @@ const Home = () => {
 
   // 배열이 빈 값이면 componentDidMount()와 같은 역할! 그래서 초기 한번만 dispatch함!
   useEffect(() => {
+    // 유저 정보 가져오기
+    dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
+    // 게시글 불러오기
     dispatch({
       type: LOAD_POSTS_REQUEST,
     });
