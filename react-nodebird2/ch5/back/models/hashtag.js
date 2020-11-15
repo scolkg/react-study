@@ -8,6 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {
+    modelName: 'Hashtag',
+    tableName: 'hashtags',
     charset: 'utf8mb4', // 이모티콘까지 되는 캐릭터셋
     collate: 'utf8mb4_general_ci', // 한글 저장
   });

@@ -8,6 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     }
   }, {
+    modelName: 'Image',
+    tableName: 'images',
     charset: 'utf8', // 이모티콘까지 되는 캐릭터셋
     collate: 'utf8_general_ci', // 한글 저장
   });

@@ -4,8 +4,10 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 
 const postRouter = require('./routes/post');
+const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/user');
 const db = require('./models');
 const passportConfig = require('./passport');
@@ -24,6 +26,9 @@ db.sequelize.sync()
 
 // 중앙통제실인 app.js에서 패스포트 설정 실행
 passportConfig();
+
+// 로그 설정 (프론트에서 백엔드로 요청 보낼 때 기록해준다)
+app.use(morgan('dev'));
 
 // cors 설정
 // origin: true 로 설정해두면 * 대신 보낸 곳의 주소가 자동으로 들어가 편리하다.
@@ -54,6 +59,7 @@ app.use(passport.session());
 
 // 모든 라우트를 여기서 임포트한다.
 app.use('/post', postRouter);
+app.use('/posts', postsRouter);
 app.use('/user', userRouter);
 
 // 에러처리 미들웨어는 내부적으로 기본으로 존재하나 이렇게 커스텀할 수 있다.

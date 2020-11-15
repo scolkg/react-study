@@ -6,6 +6,12 @@ export const initialState = {
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true, // 더이상 포스트를 가져올지 안가져올지 정해주는 변수, 처음엔 10개 가져오므로 true
+  likePostLoading: false,
+  likePostDone: false,
+  likePostError: null,
+  unlikePostLoading: false,
+  unlikePostDone: false,
+  unlikePostError: null,
   loadPostsLoading: false, // 포스트들 로드 시도중
   loadPostsDone: false,
   loadPostsError: null,
@@ -45,7 +51,7 @@ initialState.mainPosts = initialState.mainPosts.concat(
 
 // 인피니트스크롤링을 위해 사가에서 쓰기 위해 데이터 가져오는 부분을 함수로 만들어서
 // 사가에서 호출해보자
-export const generateDummyPost = (number) => Array(number).fill().map(() => ({
+/* export const generateDummyPost = (number) => Array(number).fill().map(() => ({
   id: shortId.generate(),
   User: {
     id: shortId.generate(),
@@ -62,7 +68,15 @@ export const generateDummyPost = (number) => Array(number).fill().map(() => ({
     },
     content: faker.lorem.sentence(),
   }],
-}));
+})); */
+
+export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST';
+export const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS';
+export const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE';
+
+export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
+export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
+export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
 export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST';
 export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS';
@@ -95,6 +109,39 @@ export const addComment = (data) => ({
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   // immer를 쓰면 불변성을 지키지 않아야 한다! 알아서 immer가 처리하기 때문에!
   switch (action.type) {
+    case LIKE_POST_REQUEST:
+      draft.likePostLoading = true;
+      draft.likePostDone = false;
+      draft.likePostError = null;
+      break;
+    case LIKE_POST_SUCCESS: {
+      const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+      post.Likers.push({ id: action.data.UserId });
+      draft.likePostLoading = false;
+      draft.likePostDone = true;
+      break;
+    }
+    case LIKE_POST_FAILURE:
+      draft.likePostLoading = false;
+      draft.likePostError = action.error;
+      break;
+    case UNLIKE_POST_REQUEST:
+      draft.unlikePostLoading = true;
+      draft.unlikePostDone = false;
+      draft.unlikePostError = null;
+      break;
+    case UNLIKE_POST_SUCCESS: {
+      const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+      // 원래는 splice()쓰는게 의미상 맞지만 귀찮으니 filter써도 된다.
+      post.Likers = post.Likers.filter((v) => v.id !== action.data.UserId);
+      draft.unlikePostLoading = false;
+      draft.unlikePostDone = true;
+      break;
+    }
+    case UNLIKE_POST_FAILURE:
+      draft.unlikePostLoading = false;
+      draft.unlikePostError = action.error;
+      break;
     case LOAD_POSTS_REQUEST:
       draft.loadPostsLoading = true;
       draft.loadPostsDone = false;
