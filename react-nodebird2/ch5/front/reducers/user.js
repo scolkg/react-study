@@ -1,6 +1,15 @@
 import produce from 'immer';
 
 export const initialState = {
+  removeFollowerDone: false,
+  removeFollowerError: null,
+  removeFollowerLoading: false, // 팔로워 차단 시도 중
+  loadFollowersDone: false,
+  loadFollowersError: null,
+  loadFollowersLoading: false, // 나의 팔로워 목록 가져오기 시도 중
+  loadFollowingsDone: false,
+  loadFollowingsError: null,
+  loadFollowingsLoading: false, // 나의 팔로잉 목록 가져오기 시도 중
   loadMyInfoDone: false,
   loadMyInfoError: null,
   loadMyInfoLoading: false, // 유저정보 가져오기 사도중
@@ -26,6 +35,18 @@ export const initialState = {
   signUpData: {},
   loginData: {},
 };
+
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
+export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
+export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
+
+export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST';
+export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS';
+export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE';
+
+export const LOAD_FOLLOWINGS_REQUEST = 'LOAD_FOLLOWINGS_REQUEST';
+export const LOAD_FOLLOWINGS_SUCCESS = 'LOAD_FOLLOWINGS_SUCCESS';
+export const LOAD_FOLLOWINGS_FAILURE = 'LOAD_FOLLOWINGS_FAILURE';
 
 export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
@@ -79,6 +100,48 @@ export const changeNickname = (data) => ({
 // saga의 watchLogin*() 과 거의 동시에 reducer의 이 LOG_IN_REQUEST로 함께 실행된다.
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
+    case REMOVE_FOLLOWER_REQUEST:
+      draft.removeFollowerLoading = true;
+      draft.removeFollowerDone = false;
+      draft.removeFollowerError = null;
+      break;
+    case REMOVE_FOLLOWER_SUCCESS:
+      draft.removeFollowerLoading = false;
+      draft.removeFollowerDone = true;
+      draft.me.Followers = draft.me.Followers.filter((v) => v.id !== action.data.UserId);
+      break;
+    case REMOVE_FOLLOWER_FAILURE:
+      draft.removeFollowerLoading = false;
+      draft.removeFollowerError = action.error;
+      break;
+    case LOAD_FOLLOWINGS_REQUEST:
+      draft.loadFollowingsLoading = true;
+      draft.loadFollowingsDone = false;
+      draft.loadFollowingsError = null;
+      break;
+    case LOAD_FOLLOWINGS_SUCCESS:
+      draft.loadFollowingsLoading = false;
+      draft.loadFollowingsDone = true;
+      draft.me.Followings = action.data;
+      break;
+    case LOAD_FOLLOWINGS_FAILURE:
+      draft.loadFollowingsLoading = false;
+      draft.loadFollowingsError = action.error;
+      break;
+    case LOAD_FOLLOWERS_REQUEST:
+      draft.loadFollowersLoading = true;
+      draft.loadFollowersDone = false;
+      draft.loadFollowersError = null;
+      break;
+    case LOAD_FOLLOWERS_SUCCESS:
+      draft.loadFollowersLoading = false;
+      draft.loadFollowersDone = true;
+      draft.me.Followers = action.data;
+      break;
+    case LOAD_FOLLOWERS_FAILURE:
+      draft.loadFollowersLoading = false;
+      draft.loadFollowersError = action.error;
+      break;
     case LOAD_MY_INFO_REQUEST:
       draft.loadMyInfoLoading = true;
       draft.loadMyInfoDone = false;
@@ -101,7 +164,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case FOLLOW_SUCCESS:
       draft.followLoading = false;
       draft.followDone = true;
-      draft.me.Followings.push({ id: action.data });
+      draft.me.Followings.push({ id: action.data.UserId });
       break;
     case FOLLOW_FAILURE:
       draft.followLoading = false;
@@ -116,7 +179,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.unfollowLoading = false;
       draft.unfollowDone = true;
       // 언팔로우 한사람 제외한 나머지를 Followings에 넣는다.
-      draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data);
+      draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data.UserId);
       break;
     case UNFOLLOW_FAILURE:
       draft.unfollowLoading = false;
@@ -170,6 +233,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.changeNicknameError = null;
       break;
     case CHANGE_NICKNAME_SUCCESS:
+      draft.me.nickname = action.data.nickname;
       draft.changeNicknameLoading = false;
       draft.changeNicknameDone = true;
       break;

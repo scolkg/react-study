@@ -1,9 +1,20 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs'); // 파일시스템 조작해주는 라이브러리 (폴더생성 등)
 
 const { isLoggedIn } = require('./middlewares');
 const { Post, Image, Comment, User } = require('../models');
 
 const router = express.Router();
+
+// uploads 폴더 없으면 자동 생성
+try {
+  fs.accessSync('uploads');
+} catch (error) {
+  console.log('uploads 폴더가 없으므로 생성합니다.');
+  fs.mkdirSync('uploads');
+}
 
 router.post('/', isLoggedIn, async (req, res, next) => { // POST /post
   try {
@@ -42,6 +53,31 @@ router.post('/', isLoggedIn, async (req, res, next) => { // POST /post
   }
 });
 
+// 이미지 업로드 multer는 app에 적용할 수 있지만 개별적으로 라우터마다 적용한다. form 마다 멀티파트 사용 유무가 다르기 떄문에
+// multer 설정
+// 지금은 하드디스큰데 나중엔 클라우드에 저장해야 한다. 나중에 백엔데에 요청이 늘어나면 서버 스케일링을 해줘야하는데 (같은파일을 여러 서버에 복사)
+// 이미지 용량도 크니 서버에 쓸 데 없는 용량을 줄여야 하므로 aws등의 클라우드를 이용하는 게 좋다.
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads');
+    },
+    filename(req, file, done) { // 제로초.png
+      // 파일 이름 중복이 있으면 안되므로 이름에 현재 시간을 붙여서 변경해준다.
+      const ext = path.extname(file.originalname); // 확장자 추출 (.png)
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + new Date().getTime() + ext); // 제로초1511818291.png
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+});
+// 3번째 파라미터: 한장만 올릴거면 upload.single('image'), 폼에 파일 input이 두개이상씩 있을 땐 upload.fields() 텍스트-json만 있다 그러면 upload.none() 쓰면 된다.
+// 순서: isLoggedIn으로 로그인검사부터 하고, upload.array()로 업로드해준다.
+router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next) => { // POST /post/images
+  console.log(req.files); // 업로드된 파일들의 정보가 들어있다.
+  res.json(req.files.map((v) => v.filename)); // 업로드된 파일들 정보를 프론트로 보내준다.
+});
+
 // 세미콜론은 동적으로 바뀌는 주소부분인데 이게 파라미터이다. 이건 req.params. 로 사용 가능.
 router.post('/:postId/comment', isLoggedIn, async (req, res, next) => { // POST /post/1/comment
   try {
@@ -55,7 +91,7 @@ router.post('/:postId/comment', isLoggedIn, async (req, res, next) => { // POST 
     
     const comment = await Comment.create({
       content: req.body.content,
-      PostId: parseInt(req.params.postId),
+      PostId: parseInt(req.params.postId, 10),
       UserId: req.user.id,
     });
 
@@ -103,8 +139,19 @@ router.delete('/:postId/like', isLoggedIn, async (req, res, next) => { // DELETE
   }
 });
 
-router.delete('/', (req, res) => { // DELETE /post
-  res.json({ id: 1 });
+router.delete('/:postId', isLoggedIn, async (req, res, next) => { // DELETE /post/1
+  try {
+    await Post.destroy({
+      where: { 
+        id: req.params.postId,
+        UserId: req.user.id,
+      },
+    });
+    res.status(200).json({ PostId: parseInt(req.params.postId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
 });
 
 module.exports = router;

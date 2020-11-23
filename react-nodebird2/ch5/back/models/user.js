@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'users',
     charset: 'utf8',
     collate: 'utf8_general_ci', // 한글 저장
+    sequelize,
   });
   
   // 테이블간 관계는 associate에 정의.
@@ -29,11 +30,11 @@ module.exports = (sequelize, DataTypes) => {
     db.User.hasMany(db.Post);
     db.User.hasMany(db.Comment);
     // 두번째 인자에서 중간 테이블 이름도 정해줄 수 있다. as(별칭)에 따라 내가 좋아요를 누른 게시글들을 정해준다.
-    db.User.belongsToMany(db.Post, { 'through': 'Like', as: 'Liked' });
+    db.User.belongsToMany(db.Post, { through: 'Like', as: 'Liked' });
     // 내가 팔로잉하는 유저들을 찾아라 할 때 중간테이블에서 나를 먼저 찾아야 한다.
     // 그런데 같은 테이블이라 userId가 똑같으니 포린키로 구별해주는 것이다.
-    db.User.belongsToMany(db.User, { 'through': 'Follow', as: 'Followers', foreignkey: 'FollowingId' });
-    db.User.belongsToMany(db.User, { 'through': 'Follow', as: 'Followings', foreignkey: 'FollowerId' });
+    db.User.belongsToMany(db.User, { through: 'Follow', as: 'Followers', foreignKey: 'FollowingId' });
+    db.User.belongsToMany(db.User, { through: 'Follow', as: 'Followings', foreignKey: 'FollowerId' });
   };
 
   return User;

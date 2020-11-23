@@ -11,6 +11,7 @@ const { User, Post } = require('../models'); // models 폴더 (models/index.js)�
 // 왜 직접 req.isAuthenticated() 를 써가면서 검사하면 되는데 왜 미들웨어로 따로 만들어서 쓸까?
 // 중복 제거!
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const user = require('../models/user');
 
 const router = express.Router();
 
@@ -166,6 +167,101 @@ router.post('/', isNotLoggedIn, async (req, res, next) => { // POST /user
   } catch (error) {
     console.error(error);
     // next()를 사용하면 error가 express가 한방에 처리해준다.
+    next(error);
+  }
+});
+
+// 닉네임 수정
+router.patch('/nickname', isLoggedIn, async (req, res, next) => {
+  try {
+    await User.update({
+      nickname: req.body.nickname,
+    }, {
+      where: { id: req.user.id },
+    });
+    res.status(200).json({ nickname: req.body.nickname });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 팔로우하기
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => { // PATCH /user/1/follow
+  try {
+    // 먼저 대상 유저가 존재하는지 찾아보고
+    const user = await User.findOne({ where: { id: req.params.userId }});
+    if (!user) {
+      res.status(403).send('없는 사람을 팔로우하실 순 없지');
+    }
+    // 내가 대상의 팔로워가 되는 것. (복수를 쓰면 followerS 무조건 된다 (단수는 모르겠음))
+    await user.addFollowers(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 언팔로우하기
+router.delete('/:userId/follow', isLoggedIn, async (req, res, next) => { // DELETE /user/1/follow
+  try {
+    const user = await User.findOne({ where: { id: req.params.userId }});
+    if (!user) {
+      res.status(403).send('없는 사람을 언팔로우하네?');
+    }
+    await user.removeFollowers(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 프로필 - 팔로워 목록 불러오기
+router.get('/followers', isLoggedIn, async (req, res, next) => { // GET /user/followers
+  try {
+    // 나를 먼저 찾고
+    const user = await User.findOne({ where: { id: req.user.id }});
+    if (!user) {
+      res.status(403).send('팔로워 내가 없다!!');
+    }
+    const followers = await user.getFollowers();
+    res.status(200).json(followers);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 프로필 - 팔로잉 목록 불러오기
+router.get('/followings', isLoggedIn, async (req, res, next) => { // GET /user/followings
+  try {
+    // 나를 먼저 찾고
+    const user = await User.findOne({ where: { id: req.user.id }});
+    if (!user) {
+      res.status(403).send('팔로잉 내가 없다!!');
+    }
+    const followings = await user.getFollowings();
+    res.status(200).json(followings);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 팔로워를 차단
+router.delete('/follower/:userId', isLoggedIn, async (req, res, next) => { // DELETE /user/1/follow
+  try {
+    const user = await User.findOne({ where: { id: req.params.userId }});
+    if (!user) {
+      res.status(403).send('없는 사람을 차단하려고 하네요!?');
+    }
+    // 그 대상이 나를 언팔로우하면 된다.
+    await user.removeFollowings(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 });

@@ -22,6 +22,11 @@ const FollowButton = ({ post }) => {
     }
   }, [isFollowing]);
 
+  // 내 글엔 팔로우 버튼 뜨게 하면 안되니까
+  if (post.User.id === me.id) {
+    return null;
+  }
+
   return (
     <Button loading={followLoading || unfollowLoading} onClick={onClickButton}>
       {isFollowing ? '언팔로우' : '팔로우'}
