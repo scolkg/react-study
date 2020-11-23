@@ -136,3 +136,6 @@ typings/
 .serverless
 /front/build/
 react-nodebird.pem
+
+# uploads directory
+/back/uploads/
