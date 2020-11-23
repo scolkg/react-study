@@ -138,4 +138,4 @@ typings/
 react-nodebird.pem
 
 # uploads directory
-**/back/uploads/*
+**/back/uploads
