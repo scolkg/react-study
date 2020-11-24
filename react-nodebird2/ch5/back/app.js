@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const path = require('path');
 
 const postRouter = require('./routes/post');
 const postsRouter = require('./routes/posts');
@@ -38,6 +39,11 @@ app.use(cors({
   origin: 'http://localhost:3000', // true
   credentials: true,
 }));
+
+// express가 uploads폴더를 프론트에 제공할 수 있도록 한다.
+// static미들웨어: /back/+ 폴더명을 합쳐준다. 윈도우-리눅스 디렉토리 경로가 다르므로 static 미들웨어가 알아서 처리해준다.
+// localhost:3065/ == 첫번쨰 파라미터인 '/' - 프론트에선 백단의 이미지 경로를 모르므로 보안에도 유리
+app.use('/', express.static(path.join(__dirname, 'uploads')));
 
 // req.body를 쓰려면 라우터들 연결한 것보다 위에 먼저 설정해줘야 한다. 순서가 중요!
 app.use(express.json()); // json형태 데이터를 req.body로 넣어주는 기능을 사용하겠다는 것.

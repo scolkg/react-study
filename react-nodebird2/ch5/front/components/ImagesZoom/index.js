@@ -7,7 +7,6 @@ import { Overlay, Header, CloseBtn, SlickWrapper, ImgWrapper, Indicator, Global 
 // 스타일드컴포넌트를 같은 js에 쓰면 너무 길어지니 스타일드는 따로 두고 import하여 쓰기 위함.
 const ImagesZoom = ({ images, onClose }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-
   return (
     <Overlay>
       <Global />
@@ -27,7 +26,7 @@ const ImagesZoom = ({ images, onClose }) => {
           >
             {images.map((v) => (
               <ImgWrapper key={v.src}>
-                <img src={v.src} alt={v.src} />
+                <img src={`http://localhost:3065/${v.src}`} alt={v.src} />
               </ImgWrapper>
             ))}
           </Slick>

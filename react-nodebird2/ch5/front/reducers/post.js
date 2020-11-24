@@ -101,6 +101,9 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
+// 동기 액션은 하나만 만들면 된다.
+export const REMOVE_IMAGE = 'REMOVE_IMAGE';
+
 // 동적 액션 크리에이터 (액션을 그때그때 생성해주는 크리에이터)
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
@@ -116,6 +119,10 @@ export const addComment = (data) => ({
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   // immer를 쓰면 불변성을 지키지 않아야 한다! 알아서 immer가 처리하기 때문에!
   switch (action.type) {
+    case REMOVE_IMAGE:
+      // 서버에선 지우지 않으므로 REQUEST, SUCCESS, FAILUERE 등 비동기 처리가 필요 없다
+      draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
+      break;
     case UPLOAD_IMAGES_REQUEST:
       draft.uploadImagesLoading = true;
       draft.uploadImagesDone = false;
@@ -190,6 +197,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.addPostLoading = false;
       draft.addPostDone = true;
       draft.mainPosts.unshift(action.data);
+      draft.imagePaths = []; // imagePaths 초기화 (업로드 끝났으니 작성창의 이미지들 지워준다)
       break;
     case ADD_POST_FAILURE:
       draft.addPostLoading = false;

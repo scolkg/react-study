@@ -16,7 +16,27 @@ try {
   fs.mkdirSync('uploads');
 }
 
-router.post('/', isLoggedIn, async (req, res, next) => { // POST /post
+// 이미지 업로드 multer는 app에 적용할 수 있지만 개별적으로 라우터마다 적용한다. form 마다 멀티파트 사용 유무가 다르기 떄문에
+// multer 설정
+// 지금은 하드디스큰데 나중엔 클라우드에 저장해야 한다. 나중에 백엔데에 요청이 늘어나면 서버 스케일링을 해줘야하는데 (같은파일을 여러 서버에 복사)
+// 이미지 용량도 크니 서버에 쓸 데 없는 용량을 줄여야 하므로 aws등의 클라우드를 이용하는 게 좋다.
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads');
+    },
+    filename(req, file, done) { // 제로초.png
+      // 파일 이름 중복이 있으면 안되므로 이름에 현재 시간을 붙여서 변경해준다.
+      const ext = path.extname(file.originalname); // 확장자 추출 (.png)
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + '_' + new Date().getTime() + ext); // 제로초1511818291.png
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+});
+
+// 이미 이미지는 서버에 올라갔기 때문에 upload.none()으로 텍스트 데이터만 올리면 된다.
+router.post('/', isLoggedIn, upload.none(), async (req, res, next) => { // POST /post
   try {
     const post = await Post.create({
       content: req.body.content,
@@ -24,6 +44,21 @@ router.post('/', isLoggedIn, async (req, res, next) => { // POST /post
       // 라우터 접근할 때마다 passport.deserializeUser가 자동 실행되어 req.user를 사용할 수 있다.
       UserId: req.user.id, 
     });
+
+    // 이미지 텍스트 정보가 있는지 확인
+    if (req.body.image) {
+      if (Array.isArray(req.body.image)) { // 이미지를 여러 개 올리면 image: [제로초.png, 부기초.png] 처럼 배열로 들어오고 한개면 배열이 아니니 if 써서 판단.
+        // 배열로 들어온 이미지 정보들을 시퀄라이즈 해준다.
+        // create()는 promise이므로 await Prosmise.all() 해준다.
+        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image }))); // 주소만 넣으면 된다. 실제 데이터는 CDN 에 저장하여 캐싱을 이용하면 더 빠르니까.
+        await post.addImages(images); // post에 images 주소들 추가
+      
+      } else { // 이미지를 하나만 올리면 image: 제로초.png
+        const image = await Image.create({ src: req.body.image });
+        await post.addImages(image);
+      }
+    }
+
     // 다시 정보를 완성시켜서 프론트로 응답해줘야 한다.
     const fullPost = await Post.findOne({
       where: { id: post.id },
@@ -53,24 +88,6 @@ router.post('/', isLoggedIn, async (req, res, next) => { // POST /post
   }
 });
 
-// 이미지 업로드 multer는 app에 적용할 수 있지만 개별적으로 라우터마다 적용한다. form 마다 멀티파트 사용 유무가 다르기 떄문에
-// multer 설정
-// 지금은 하드디스큰데 나중엔 클라우드에 저장해야 한다. 나중에 백엔데에 요청이 늘어나면 서버 스케일링을 해줘야하는데 (같은파일을 여러 서버에 복사)
-// 이미지 용량도 크니 서버에 쓸 데 없는 용량을 줄여야 하므로 aws등의 클라우드를 이용하는 게 좋다.
-const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, 'uploads');
-    },
-    filename(req, file, done) { // 제로초.png
-      // 파일 이름 중복이 있으면 안되므로 이름에 현재 시간을 붙여서 변경해준다.
-      const ext = path.extname(file.originalname); // 확장자 추출 (.png)
-      const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + new Date().getTime() + ext); // 제로초1511818291.png
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
-});
 // 3번째 파라미터: 한장만 올릴거면 upload.single('image'), 폼에 파일 input이 두개이상씩 있을 땐 upload.fields() 텍스트-json만 있다 그러면 upload.none() 쓰면 된다.
 // 순서: isLoggedIn으로 로그인검사부터 하고, upload.array()로 업로드해준다.
 router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next) => { // POST /post/images
