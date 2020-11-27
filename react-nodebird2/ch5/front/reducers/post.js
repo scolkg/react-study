@@ -27,6 +27,9 @@ export const initialState = {
   uploadImagesLoading: false, // 이미지 업로드 시도중
   uploadImagesDone: false,
   uploadImagesError: null,
+  retweetLoading: false, // 리트윗 시도중
+  retweetDone: false,
+  retweetError: null,
 };
 
 /*
@@ -72,6 +75,10 @@ initialState.mainPosts = initialState.mainPosts.concat(
     content: faker.lorem.sentence(),
   }],
 })); */
+
+export const RETWEET_REQUEST = 'RETWEET_REQUEST';
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
+export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
 export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
 export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
@@ -119,6 +126,21 @@ export const addComment = (data) => ({
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   // immer를 쓰면 불변성을 지키지 않아야 한다! 알아서 immer가 처리하기 때문에!
   switch (action.type) {
+    case RETWEET_REQUEST:
+      draft.retweetLoading = true;
+      draft.retweetDone = false;
+      draft.retweetError = null;
+      break;
+    case RETWEET_SUCCESS: {
+      draft.retweetLoading = false;
+      draft.retweetDone = true;
+      draft.mainPosts.unshift(action.data);
+      break;
+    }
+    case RETWEET_FAILURE:
+      draft.retweetLoading = false;
+      draft.retweetError = action.error;
+      break;
     case REMOVE_IMAGE:
       // 서버에선 지우지 않으므로 REQUEST, SUCCESS, FAILUERE 등 비동기 처리가 필요 없다
       draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
@@ -171,18 +193,25 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.unlikePostLoading = false;
       draft.unlikePostError = action.error;
       break;
-    case LOAD_POSTS_REQUEST:
+    case LOAD_POSTS_REQUEST: {
+      // 다른 페이지 갔다 메인 올 때 중복 게시글 호출하는 것 방지.
+      if (!action.lastId) {
+        draft.mainPosts = [];
+      }
+      console.log('reducer lastid-> ', action.lastId);
       draft.loadPostsLoading = true;
       draft.loadPostsDone = false;
       draft.loadPostsError = null;
       break;
+    }
     case LOAD_POSTS_SUCCESS:
       draft.loadPostsLoading = false;
       draft.loadPostsDone = true;
-      draft.mainPosts = action.data.concat(draft.mainPosts);
+      draft.mainPosts = draft.mainPosts.concat(action.data);
       // console.log('mainPosts.length', action.data.concat(draft.mainPosts).length);
-      // 50개 이상이 되면 더이상 안가져오겠다.
-      draft.hasMorePosts = draft.mainPosts.length < 50;
+      // 항상 10개씩 더 불러오는데 10가 다 차 있으면 그다음 있을걸라고 생각할 수 있다.
+      // 그런데 총 게시글이 10의 배수라면 한번의 낭비는 발생할 수 있다.
+      draft.hasMorePosts = action.data.length === 10;
       break;
     case LOAD_POSTS_FAILURE:
       draft.loadPostsLoading = false;
