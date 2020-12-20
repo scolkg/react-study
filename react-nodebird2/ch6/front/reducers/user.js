@@ -10,9 +10,12 @@ export const initialState = {
   loadFollowingsDone: false,
   loadFollowingsError: null,
   loadFollowingsLoading: false, // 나의 팔로잉 목록 가져오기 시도 중
+  loadUserDone: false,
+  loadUserError: null,
+  loadUserLoading: false, // 유저정보 가져오기 사도중
   loadMyInfoDone: false,
   loadMyInfoError: null,
-  loadMyInfoLoading: false, // 유저정보 가져오기 사도중
+  loadMyInfoLoading: false, // 나의 정보 가져오기 사도중
   followLoading: false, // 팔로우 시도중
   followDone: false,
   followError: null,
@@ -32,8 +35,7 @@ export const initialState = {
   changeNicknameDone: false,
   changeNicknameError: null,
   me: null,
-  signUpData: {},
-  loginData: {},
+  userInfo: null,
 };
 
 export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
@@ -47,6 +49,10 @@ export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE';
 export const LOAD_FOLLOWINGS_REQUEST = 'LOAD_FOLLOWINGS_REQUEST';
 export const LOAD_FOLLOWINGS_SUCCESS = 'LOAD_FOLLOWINGS_SUCCESS';
 export const LOAD_FOLLOWINGS_FAILURE = 'LOAD_FOLLOWINGS_FAILURE';
+
+export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
+export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
+export const LOAD_USER_FAILURE = 'LOAD_USER_FAILURE';
 
 export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
@@ -141,6 +147,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_FOLLOWERS_FAILURE:
       draft.loadFollowersLoading = false;
       draft.loadFollowersError = action.error;
+      break;
+    case LOAD_USER_REQUEST:
+      draft.loadUserLoading = true;
+      draft.loadUserDone = false;
+      draft.loadUserError = null;
+      break;
+    case LOAD_USER_SUCCESS:
+      draft.loadUserLoading = false;
+      draft.loadUserDone = true;
+      draft.userInfo = action.data;
+      break;
+    case LOAD_USER_FAILURE:
+      draft.loadUserLoading = false;
+      draft.loadUserError = action.error;
       break;
     case LOAD_MY_INFO_REQUEST:
       draft.loadMyInfoLoading = true;

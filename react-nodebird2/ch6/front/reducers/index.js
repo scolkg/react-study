@@ -4,21 +4,21 @@ import { combineReducers } from 'redux';
 import user from './user';
 import post from './post';
 
-// (이전상태, 액션) => 다음상태 를 만들어내는 것이 reducer이다.
-const rootReducer = combineReducers({
-  // 서버사이드랜더링을 위한 HYDRATE 사용을 위해 index추가.
-  index: (state = {}, action) => {
-    switch (action.type) {
-      case HYDRATE:
-        console.log('HYDRATE', action);
-        return { ...state, ...action.payload };
-
-      default:
-        return state;
+// 서버사이드랜더링에서 index안에 index, user, post가 들어가 있는 구조가 되므로
+// user, post 따로 최상위로 각각 존재하게 하려고 아래처럼 바꿔줘야 한다.
+const rootReducer = (state, action) => {
+  switch (action.type) {
+    case HYDRATE:
+      console.log('HYDRATE', action);
+      return action.payload;
+    default: {
+      const combinedReducer = combineReducers({
+        user,
+        post,
+      });
+      return combinedReducer(state, action);
     }
-  },
-  user,
-  post,
-});
+  }
+};
 
 export default rootReducer;

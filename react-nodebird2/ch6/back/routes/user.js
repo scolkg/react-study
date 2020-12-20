@@ -1,7 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { User, Post } = require('../models'); // models 폴더 (models/index.js)를 구조분해할당
+const { Op } = require('sequelize');
+const { User, Post, Image, Comment } = require('../models'); // models 폴더 (models/index.js)를 구조분해할당
 
 // 커스텀으로 만든 미들웨어를 불러와서 라우터의 두번째 인자에 넣어서 next() 를 호출하면
 // 다음 미들웨어로 이동하라는 것이니 위에서부터 아래로, 왼쪽에서부터 아래로.
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // 클라에서 온 유저 로그인 정보 쿠키를 이용하여 로그인 체크
 router.get('/', async (req, res, next) => { // GET /user
+  // console.log(req.headers);
   try {
     // 새로고침할 때마다 호출되는데 req.user 즉 사용자 정보가 들어있을 때만 찾는다.
     if (req.user) {
@@ -226,7 +228,9 @@ router.get('/followers', isLoggedIn, async (req, res, next) => { // GET /user/fo
     if (!user) {
       res.status(403).send('팔로워 내가 없다!!');
     }
-    const followers = await user.getFollowers();
+    const followers = await user.getFollowers({
+      limit: parseInt(req.query.limit),
+    });
     res.status(200).json(followers);
   } catch (error) {
     console.error(error);
@@ -242,7 +246,9 @@ router.get('/followings', isLoggedIn, async (req, res, next) => { // GET /user/f
     if (!user) {
       res.status(403).send('팔로잉 내가 없다!!');
     }
-    const followings = await user.getFollowings();
+    const followings = await user.getFollowings({
+      limit: parseInt(req.query.limit),
+    });
     res.status(200).json(followings);
   } catch (error) {
     console.error(error);
@@ -260,6 +266,97 @@ router.delete('/follower/:userId', isLoggedIn, async (req, res, next) => { // DE
     // 그 대상이 나를 언팔로우하면 된다.
     await user.removeFollowings(req.user.id);
     res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 다른 사용자의 게시글들 가져오기
+router.get('/:userId/posts', async (req, res, next) => { // GET // user/1/posts
+  try {
+    const where = { userId: req.params.userId };
+    if (parseInt(req.query.lastId, 10)) { // 초기 로딩이 아닐 때 (스크롤 내려서 더 불러올 떄)
+      // 원래 [Op.lt] 가 아닌 예전엔 $lt: ... 로 썼는데 sql인젝션 위험으로 쓰지 않는다.
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) } // lastId 보다 작은 id의 게시글들을 불러와야 한다.
+    }
+    const posts = await Post.findAll({
+      where,
+      limit: 10, // 10개 제한
+      // offset: 0, // 0번째부터 10개를 가져와라. offset방식은 치명적인 단점이 있는데 도중에 게시글이 삭제하거나 글을 생성하면 limit과 offset이 꼬여버린다. 그래서 lastId를 이용하는 방법을 쓰자.
+      order: [['createdAt', 'DESC']], // 작성시간 내림차순으로 (최신글이 맨 앞에 정렬되게)
+      include: [{
+        model: User,
+        attributes: ['id', 'nickname'],
+      }, {
+        model: Image,
+      }, {
+        model: Comment,
+        include: [{
+          model: User,
+          attiributes: ['id', 'nickname'],
+          order: [['createdAt', 'DESC']],
+        }]
+      }, {
+        model: User, // 게시글 좋아요 누른 사람들 (Likers)
+        as: 'Likers', // 이렇게 해야 게시글, 댓글 작성자와 구별되고 post.Likers를 사용할 수 있다.
+        attributes: ['id'],
+      }, {
+        model: Post,
+        as: 'Retweet',
+        include: [{
+          model: User,
+          attributes: ['id', 'nickname'],
+        }, {
+          model: Image,
+        }]
+      }],
+    });
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// 다른 유저 정보 가져오기
+// 미들웨어는 위에서 아래로, 왼쪽에서 오른쪽으로 순차적으로 실행된다. /:userId <- 이런걸 와일드카드로 하는데 이게 /followings 같은 게 오면 위에서부터 실행되니
+// 여기서 엉뚱하게 실행될 수 있다. 그래서 이런 와일드카드 url은 최대한 가장 아래에 위치하도록 하자.
+router.get('/:userId', async (req, res, next) => { // GET /user/1
+  try {
+    // user를 프론트로 응답해주는데 필요한 정보를 가공해주자. 비번은 위험하니 빼자.(보낼필요도없고)
+    const fullUserWithoutPassword = await User.findOne({
+      where: { id: req.params.userId },
+      attributes: {
+        exclude: ['password'],
+      },
+      include: [{
+        model: Post, // 여기선 단수지만 hasMany 관계라서 복수형이 되어 me.Posts가 된다.!!
+        attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
+      }, {
+        model: User, // 마찬가지로 models/user의 Followings 모델 포함 (as가 있으면 as 써줘야한다!)
+        as: 'Followings',
+        attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
+      }, {
+        model: User, // 마찬가지로 models/user의 Followers 모델 포함
+        as: 'Followers',
+        attributes: ['id'], // 전부를 가져 올 필요 없다. 아이디만 가져와서 몇개인지 카운트만 되면 된다.
+      }]
+    });
+    if (fullUserWithoutPassword) {
+      // 시퀄라이즈로 바꿔준 데이터는 JSON으로 바꾸어 쓸 수 있게 만든다.
+      const data = fullUserWithoutPassword.toJSON();
+
+      // 개인정보 침해 보안을 위해 length만 넣어서 보내준다.
+      data.Posts = data.Posts.length;
+      data.Followers = data.Followers.length;
+      data.Followings = data.Followings.length;
+
+      res.status(200).json(data);
+    } else {
+      res.status(404).json('존재하지 않는 사용자입니다.');
+    }
+    
   } catch (error) {
     console.error(error);
     next(error);

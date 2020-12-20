@@ -255,4 +255,40 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => { // POST 
   }
 });
 
+// 게시글 하나 불러오기
+router.get('/:postId/', async (req, res, next) => { // GET /post/1
+  try {
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+      include: [{
+        model: User,
+        attributes: ['id', 'nickname'],
+      }, {
+        model: Image,
+      }, {
+        model: Comment,
+        include: [{
+          model: User,
+          attributes: ['id', 'nickname'],
+          order: [['createdAt', 'DESC']],
+        }],
+      }, {
+        model: User, // 좋아요 누른 사람
+        as: 'Likers',
+        attributes: ['id'],
+      }],
+    });
+    console.log(post);
+    console.log('www');
+    if (!post) {
+      console.log('what');
+      return res.sendStatus(403).send('존재하지 않는 게시글입니다.');
+    }
+    res.status(200).json(post);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 module.exports = router;

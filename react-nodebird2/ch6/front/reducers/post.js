@@ -1,7 +1,8 @@
-import produce from 'immer';
+import produce, { enableES5 } from 'immer';
 
 export const initialState = {
   mainPosts: [],
+  singlePost: null,
   imagePaths: [],
   hasMorePosts: true, // 더이상 포스트를 가져올지 안가져올지 정해주는 변수, 처음엔 10개 가져오므로 true
   likePostLoading: false,
@@ -13,6 +14,9 @@ export const initialState = {
   loadPostsLoading: false, // 포스트들 로드 시도중
   loadPostsDone: false,
   loadPostsError: null,
+  loadPostLoading: false, // 포스트 하나 로드 시도중
+  loadPostDone: false,
+  loadPostError: null,
   addPostLoading: false, // 포스트 추가 시도중
   addPostDone: false,
   addPostError: null,
@@ -30,50 +34,6 @@ export const initialState = {
   retweetError: null,
 };
 
-/*
-initialState.mainPosts = initialState.mainPosts.concat(
-  Array(20).fill().map(() => ({
-    id: shortId.generate(),
-    User: {
-      id: shortId.generate(),
-      nickname: faker.name.findName(),
-    },
-    content: faker.lorem.paragraph(),
-    Images: [{
-      src: faker.image.imageUrl(),
-    }],
-    Comments: [{
-      User: {
-        id: shortId.generate(),
-        nickname: faker.name.findName(),
-      },
-      content: faker.lorem.sentence(),
-    }],
-  })),
-);
-*/
-
-// 인피니트스크롤링을 위해 사가에서 쓰기 위해 데이터 가져오는 부분을 함수로 만들어서
-// 사가에서 호출해보자
-/* export const generateDummyPost = (number) => Array(number).fill().map(() => ({
-  id: shortId.generate(),
-  User: {
-    id: shortId.generate(),
-    nickname: faker.name.findName(),
-  },
-  content: faker.lorem.paragraph(),
-  Images: [{
-    src: faker.image.image(),
-  }],
-  Comments: [{
-    User: {
-      id: shortId.generate(),
-      nickname: faker.name.findName(),
-    },
-    content: faker.lorem.sentence(),
-  }],
-})); */
-
 export const RETWEET_REQUEST = 'RETWEET_REQUEST';
 export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
 export const RETWEET_FAILURE = 'RETWEET_FAILURE';
@@ -90,9 +50,21 @@ export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
 export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
 export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
+export const LOAD_USER_POSTS_REQUEST = 'LOAD_USER_POSTS_REQUEST';
+export const LOAD_USER_POSTS_SUCCESS = 'LOAD_USER_POSTS_SUCCESS';
+export const LOAD_USER_POSTS_FAILURE = 'LOAD_USER_POSTS_FAILURE';
+
 export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST';
 export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS';
 export const LOAD_POSTS_FAILURE = 'LOAD_POSTS_FAILURE';
+
+export const LOAD_HASHTAG_POSTS_REQUEST = 'LOAD_HASHTAG_POSTS_REQUEST';
+export const LOAD_HASHTAG_POSTS_SUCCESS = 'LOAD_HASHTAG_POSTS_SUCCESS';
+export const LOAD_HASHTAG_POSTS_FAILURE = 'LOAD_HASHTAG_POSTS_FAILURE';
+
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
@@ -122,6 +94,7 @@ export const addComment = (data) => ({
 
 // reducer란 이전 상태를 액션을 통해 다음 상태로 만들어내는 함수! (단, 불변성을 지키면서!) ...이 필요없다!
 const reducer = (state = initialState, action) => produce(state, (draft) => {
+  enableES5();
   // immer를 쓰면 불변성을 지키지 않아야 한다! 알아서 immer가 처리하기 때문에!
   switch (action.type) {
     case RETWEET_REQUEST:
@@ -191,6 +164,9 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.unlikePostLoading = false;
       draft.unlikePostError = action.error;
       break;
+    // 한 페이지에서 같이 쓰이지 않는 액션에 대해서는 상태값들이 공유되도 된다. 그 중에 이렇게 같이 써도 state와 코드량을 줄여주니까 좋다.
+    case LOAD_USER_POSTS_REQUEST:
+    case LOAD_HASHTAG_POSTS_REQUEST:
     case LOAD_POSTS_REQUEST: {
       // 다른 페이지 갔다 메인 올 때 중복 게시글 호출하는 것 방지.
       if (!action.lastId) {
@@ -202,6 +178,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.loadPostsError = null;
       break;
     }
+    case LOAD_USER_POSTS_SUCCESS:
+    case LOAD_HASHTAG_POSTS_SUCCESS:
     case LOAD_POSTS_SUCCESS:
       draft.loadPostsLoading = false;
       draft.loadPostsDone = true;
@@ -211,9 +189,25 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       // 그런데 총 게시글이 10의 배수라면 한번의 낭비는 발생할 수 있다.
       draft.hasMorePosts = action.data.length === 10;
       break;
+    case LOAD_USER_POSTS_FAILURE:
+    case LOAD_HASHTAG_POSTS_FAILURE:
     case LOAD_POSTS_FAILURE:
       draft.loadPostsLoading = false;
       draft.loadPostsError = action.error;
+      break;
+    case LOAD_POST_REQUEST:
+      draft.loadPostLoading = true;
+      draft.loadPostDone = false;
+      draft.loadPostError = null;
+      break;
+    case LOAD_POST_SUCCESS:
+      draft.loadPostLoading = false;
+      draft.loadPostDone = true;
+      draft.singlePost = action.data;
+      break;
+    case LOAD_POST_FAILURE:
+      draft.loadPostLoading = false;
+      draft.loadPostError = action.error;
       break;
     case ADD_POST_REQUEST:
       draft.addPostLoading = true;

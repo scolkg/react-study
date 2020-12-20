@@ -17,6 +17,9 @@ import {
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
   UNFOLLOW_FAILURE,
+  LOAD_USER_REQUEST,
+  LOAD_USER_SUCCESS,
+  LOAD_USER_FAILURE,
   LOAD_MY_INFO_REQUEST,
   LOAD_MY_INFO_SUCCESS,
   LOAD_MY_INFO_FAILURE,
@@ -110,6 +113,25 @@ function* changeNickname(action) {
   }
 }
 
+function loadUserAPI(data) {
+  return axios.get(`/user/${data}`);
+}
+
+function* loadUser(action) {
+  try {
+    const result = yield call(loadUserAPI, action.data);
+    yield put({
+      type: LOAD_USER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_USER_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function loadMyInfoAPI() {
   return axios.get('/user');
 }
@@ -151,7 +173,7 @@ function* logIn(action) {
     yield put({
       type: LOG_IN_FAILURE,
       error: err.response.data,
-    })
+    });
   }
 }
 
@@ -239,7 +261,7 @@ function* unfollow(action) {
 // while(true) 로 무한으로 쓸 수 있지만 이것보다 더 간단하게 takeEvery를 쓰거나 takeLatest를 쓰면 된다.
 // takeLatest는 여러번 이벤트 클릭시에 마지막 클릭만 실행하는 것. takeEvery는 클릭한 수만큼 이벤트 실행되어 로그인 같은 액션에는 좋지 않다.
 // takeLeading은 반대로 첫번째 클릭만 실행된다.
-// takeLatest를 보통 많이 쓴다. 하지만 front단에서 게시글 저장 버튼을 여러번 클릭을 했을 때 그 요청들을 취소하는게 아니다. 
+// takeLatest를 보통 많이 쓴다. 하지만 front단에서 게시글 저장 버튼을 여러번 클릭을 했을 때 그 요청들을 취소하는게 아니다.
 // 그래서 백단에선 실제론 여러개 저장되어 있을 수 있는 게 단점이다. 그래서 백단에서 검사를 해야 한다.
 // 그래서 throttle('ADD_POST_REQUEST', 5000) 로 하면 5초간 한번만 실행되도록 하여 요청까지 취소할 수 있다.
 function* watchLogIn() {
@@ -260,6 +282,10 @@ function* watchUnfollow() {
 
 function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
+}
+
+function* watchLoadUser() {
+  yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
 
 function* watchLoadMyInfo() {
@@ -288,6 +314,7 @@ export default function* userSata() {
     fork(watchLoadFollowers),
     fork(watchLoadFollowings),
     fork(watchChangeNickname),
+    fork(watchLoadUser),
     fork(watchLoadMyInfo),
     fork(watchFollow),
     fork(watchUnfollow),

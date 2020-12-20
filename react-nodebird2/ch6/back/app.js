@@ -10,6 +10,7 @@ const path = require('path');
 const postRouter = require('./routes/post');
 const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/user');
+const hashtagRouter = require('./routes/hashtag');
 const db = require('./models');
 const passportConfig = require('./passport');
 
@@ -67,6 +68,7 @@ app.use(passport.session());
 app.use('/post', postRouter);
 app.use('/posts', postsRouter);
 app.use('/user', userRouter);
+app.use('/hashtag', hashtagRouter);
 
 // 에러처리 미들웨어는 내부적으로 기본으로 존재하나 이렇게 커스텀할 수 있다.
 // 에러페이지를 따로 띄워주고 싶다던가 등등.

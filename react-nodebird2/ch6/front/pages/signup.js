@@ -4,9 +4,12 @@ import { Form, Input, Checkbox, Button } from 'antd';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
+import { END } from 'redux-saga';
+import axios from 'axios';
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
-import { SIGN_UP_REQUEST } from '../reducers/user';
+import { SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from '../reducers/user';
+import wrapper from '../store/configureStore';
 
 const ErrorMessage = styled.div`
   color: red;
@@ -120,5 +123,24 @@ const Signup = () => {
     </>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  console.log('getServerSideProps start');
+  const cookie = context.req ? context.req.headers.cookie : ''; // 프론트서버에서 실행되는 코드니까 context.req. 이용 가능
+
+  // 실제로 쿠키를 써서 요청을 보낼 때만 넣어주고 - 쿠키를 안쓰고 요청 보낼 때는 서버에서 공유중인 쿠키를 제거해줘야 한다.
+  // 이래야 다른 사람이 접속할 때 쿠키가 공유되지 않는다.
+  axios.defaults.headers.Cookie = '';
+  if (context.req && cookie) {
+    axios.defaults.headers.Cookie = cookie;
+  }
+  context.store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
+  // request에 그치지 않고 SUCCESS 등의 응답까지 기다리려면 아래처럼 써야 한다.
+  context.store.dispatch(END);
+  console.log('getServerSideProps end');
+  await context.store.sagaTask.toPromise();
+});
 
 export default Signup;
