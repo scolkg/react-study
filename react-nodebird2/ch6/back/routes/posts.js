@@ -15,7 +15,10 @@ router.get('/', async (req, res, next) => { // GET // posts
       where,
       limit: 10, // 10개 제한
       // offset: 0, // 0번째부터 10개를 가져와라. offset방식은 치명적인 단점이 있는데 도중에 게시글이 삭제하거나 글을 생성하면 limit과 offset이 꼬여버린다. 그래서 lastId를 이용하는 방법을 쓰자.
-      order: [['createdAt', 'DESC']], // 작성시간 내림차순으로 (최신글이 맨 앞에 정렬되게)
+      order: [
+        ['createdAt', 'DESC'],
+        [Comment, 'createdAt', 'DESC'],
+      ], // 작성시간 내림차순으로 (최신글이 맨 앞에 정렬되게)
       include: [{
         model: User,
         attributes: ['id', 'nickname'],
@@ -26,7 +29,6 @@ router.get('/', async (req, res, next) => { // GET // posts
         include: [{
           model: User,
           attiributes: ['id', 'nickname'],
-          order: [['createdAt', 'DESC']],
         }]
       }, {
         model: User, // 게시글 좋아요 누른 사람들 (Likers)
