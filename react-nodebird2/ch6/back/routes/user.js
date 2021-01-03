@@ -112,19 +112,24 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 router.post('/logout', isLoggedIn, (req, res) => {
   // req.user에 담겨 있는 유저정보를 이용하면 되는데 로그아웃은 간단히 구형 가능
   console.log("--> " + req.isAuthenticated());
-  console.log(req.session);
-  req.logout();
-  console.log("@@->"+ req.isAuthenticated());
-  console.log(req.session);
-  // req.session.destory(); // 왜 안되지? - credentials 설정이 문젠가? ㅜ
-  // 일단 이렇게 콜백으로 에러 예외 처리... 쿠키를 클라한테 제대로 못받나?
-  req.session.destroy((err) => {
-    // res.clearCookie('connect.sid');
-    console.log('error req.session.destroy()');
-    console.error(err);
-  });
-  
-  res.send('ok');
+  if (req.isAuthenticated()) {
+    req.logout();
+    req.session.destroy();
+    res.send('ok');
+  } else {
+    console.log(req.session);
+    req.logout();
+    console.log("@@->"+ req.isAuthenticated());
+    console.log(req.session);
+    // req.session.destory(); // 왜 안되지? - credentials 설정이 문젠가? ㅜ
+    // 일단 이렇게 콜백으로 에러 예외 처리... 쿠키를 클라한테 제대로 못받나?
+    req.session.destroy((err) => {
+      // res.clearCookie('connect.sid');
+      console.log('error req.session.destroy()');
+      console.error(err);
+    });
+    res.send('ok');
+  }
 });
 
 // 유저 회원가입

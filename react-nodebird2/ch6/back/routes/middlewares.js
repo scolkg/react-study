@@ -3,7 +3,7 @@
 // 직접 이렇게 커스텀으로 미들웨어를 만들 수 있다.
 // 로그인 여부 검사하는 미들웨어
 exports.isLoggedIn = (req, res, next) => {
-  console.log(req.isAuthenticated());
+  console.log("왜 isAuthenticated가 false일가 ㅜ : ", req.isAuthenticated());
   if (req.isAuthenticated()) { // passport에서 지원.
     // next() 안 인자에 뭘 집어넣으면 에러를 처리하러 가는 거고 그냥 next() 호출하면
     // 다음 미들웨어로 가는 것이다.

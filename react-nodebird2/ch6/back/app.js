@@ -37,7 +37,7 @@ app.use(morgan('dev'));
 // credentials 는 기본값이 false인데 나중에 true로 바꿔줘야 한다. true로 해야 쿠키도 전달해준다. (로그인 유지 등)
 // *를 쓰면 쿠키를 보낼 때 안된다. 정확한 신뢰된 사이트 주소를 직접 적어줘야 한다. 아니면 true
 app.use(cors({
-  origin: 'http://localhost:3000', // true
+  origin: ['http://localhost:3060', 'http://localhost:3060'], // true
   credentials: true,
 }));
 
